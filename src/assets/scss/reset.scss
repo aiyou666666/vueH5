@@ -1,0 +1,280 @@
+@charset "UTF-8";
+*,
+::before,
+::after {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+html,
+body {
+    height: 100%;
+}
+html {
+    background-color: #fff;
+    color: #333;              
+    -webkit-user-select: none;
+    user-select: none;
+    font-size: 100px;
+}
+body {
+    margin: 0;
+    line-height: 1.5;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    font-family: '-apple-system', Helvetica Neue, Helvetica, STHeiTi, sans-serif;
+}
+ul,
+ol,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+figure,
+form,
+fieldset,
+legend,
+input,
+textarea,
+button,
+p,
+blockquote,
+th,
+td,
+pre,
+xmp {
+    margin: 0;
+    padding: 0;
+}
+input,
+textarea,
+button,
+select,
+pre,
+xmp,
+tt,
+code,
+kbd,
+samp {
+    line-height: inherit;
+    font-family: inherit;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+small,
+big,
+input,
+textarea,
+button,
+select {
+    font-size: inherit;
+}
+address,
+cite,
+dfn,
+em,
+i,
+optgroup,
+var {
+    font-style: normal;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+    text-align: left;
+}
+ul,
+ol,
+menu {
+    list-style: none;
+}
+fieldset,
+img {
+    border: 0;
+    vertical-align: middle;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+main,
+menu,
+nav,
+section,
+summary {
+    display: block;
+}
+audio,
+canvas,
+video {
+    display: inline-block;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+    content: "\0020";
+}
+textarea,
+pre,
+xmp {
+    overflow: auto;
+}
+textarea {
+    resize: vertical;
+}
+input,
+textarea,
+button,
+select a {
+    outline: 0 none;
+}
+input,
+textarea,
+button,
+select {
+    color: inherit;
+}
+input:disabled,
+textarea:disabled,
+button:disabled,
+select:disabled {
+    opacity: 1;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+}
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="file"]::-webkit-file-upload-button,
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+mark {
+    background-color: transparent;
+}
+a,
+ins,
+s,
+u,
+del {
+    text-decoration: none;
+}
+a,
+img {
+    -webkit-touch-callout: none;
+}
+a {
+    color: #121313;
+}
+select {
+    -webkit-appearance: none;
+    border: 0;
+    background: transparent;
+}
+input,
+select,
+textarea {
+    outline: 0;
+    background: transparent;
+    border: 0 none;
+}
+input:focus,
+select:focus,
+textarea:focus,
+input:active,
+select:active,
+textarea:active {
+    outline: 0;
+    background: transparent;
+    border: 0 none;
+}
+option {
+    font-weight: normal;
+    display: block;
+    padding: 0 2px 1px;
+    white-space: pre;
+}
+ ::-webkit-inner-spin-button {
+    visibility: hidden;
+}
+ ::-webkit-datetime-edit-text {
+    text-align: right;
+}
+.g-clear::after,
+.g-mod::after {
+    display: block;
+    overflow: hidden;
+    clear: both;
+    height: 0;
+    content: "\0020";
+}
+.hide {
+    display: none;
+}
+.hidden {
+    visibility: hidden;
+}
+.fr {
+    float: right;
+}
+.fl {
+    float: left;
+}
+.g-wrapper {
+    padding-top: 1rem;
+}
+.g-border {
+    height: 0.26rem;
+    background: #efefef;
+    width: 100%;
+}
+.g-btn-blue {
+    width: 100%;
+    display: block;
+    background: #0084ff;
+    line-height: 1rem;
+    height: 1rem;
+    font-size: 0.34rem;
+    color: #fff;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 99;
+}
+.g-main {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+$uiWidth: 750px;   //设计稿
+
+@function pxToRem($px) {
+    @return 10 * $px/$uiWidth * 1rem;
+}
+div {
+    width: pxToRem(750px);
+    background-color: #bbccff;
+    height: pxToRem(800px);
+}
+p {
+    font-size: pxToRem(32px);
+}

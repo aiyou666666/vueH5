@@ -1,0 +1,95 @@
+/*
+
+// HTML
+<i class="icon icon-home"></i>
+*/
+
+$img_host: "//static1.medlinker.net/sass-h5/webapp/images";
+
+.icon {
+    display: inline-block;
+}
+.icon-arrow-left-blue {
+    background-image: url(#{$img_host}/icon/arrow-left-blue.png);
+    background-size: 100%;
+    width: .23rem;
+    height: .42rem;
+}
+.icon-arrow-right-gray {
+    background-image: url(#{$img_host}/icon/arrow-right-gray.png);
+    background-size: 100%;
+    width: .14rem;
+    height: .24rem;
+}
+.icon-manager {
+    background-image: url(#{$img_host}/icon/manager.png);
+    background-size: 100%;
+    width: .61rem;
+    height: .61rem;
+}
+.icon-order {
+    background-image: url(#{$img_host}/icon/order.png);
+    background-size: 100%;
+    width: .49rem;
+    height: .41rem;
+}
+.icon-user {
+    background-image: url(#{$img_host}/icon/user.png);
+    background-size: 100%;
+    width: .51rem;
+    height: .5rem;
+}
+.icon-search {
+    background: url(#{$img_host}/icon/search-icon.png);
+    background-size: 100%;
+    width: .4rem;
+    height: .4rem;
+}
+.icon-arrow-bottom {
+    background: url(#{$img_host}/icon/arrow-down-gray.png);
+    background-size: 100%;
+    width: .2rem;
+    height: .12rem;
+}
+.icon-del {
+    background: url(#{$img_host}/icon/del-icon.png);
+    background-size: 100%;
+    width: .34rem;
+    height: .34rem;
+}
+.icon-arrow-up {
+    background: url(#{$img_host}/icon/arrow-up-blue.png);
+    background-size: 100%;
+    width: .2rem;
+    height: .12rem;
+}
+.icon-phone {
+    background: url(#{$img_host}/icon/icon-phone.png);
+    background-size: 100%;
+    width: .4rem;
+    height: .44rem;
+}
+.icon-arrow-left-border {
+    background: url(#{$img_host}/icon/left.png);
+    background-size: 100%;
+    width: .48rem;
+    height: .48rem;
+}
+.icon-arrow-right-border {
+    background: url(#{$img_host}/icon/right.png);
+    background-size: 100%;
+    width: .48rem;
+    height: .48rem;
+}
+.icon-calendar {
+    background: url(#{$img_host}/icon/icon-calendar.png);
+    background-size: 100%;
+    width: .41rem;
+    height: .41rem;
+}
+.icon-add {
+    background: url(#{$img_host}/icon/add.png);
+    background-size: 100%;
+    width: 1.2rem;
+    height: 1.2rem;
+}
