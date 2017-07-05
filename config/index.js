@@ -18,7 +18,7 @@ module.exports = {
 		// Run the build command with an extra argument to
 		// View the bundle analyzer report after build finishes:
 		// `npm run build --report`
-		// Set to `true` or `false` to always turn it on or off      
+		// Set to `true` or `false` to always turn it on or off
 		bundleAnalyzerReport: process.env.npm_config_report
 	},
 	dev: {
@@ -32,7 +32,7 @@ module.exports = {
 			/*'/api': {
 				target: 'http://your_website',
 				changeOrigin: true,
-				pathRewrite: { 
+				pathRewrite: {
 					 //需要rewrite重写的, 如果在服务器端做了处理则可以不要这段
 					'^/api': ''
 				}

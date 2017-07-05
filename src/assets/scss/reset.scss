@@ -270,11 +270,3 @@ $uiWidth: 750px;   //设计稿
 @function pxToRem($px) {
     @return 10 * $px/$uiWidth * 1rem;
 }
-div {
-    width: pxToRem(750px);
-    background-color: #bbccff;
-    height: pxToRem(800px);
-}
-p {
-    font-size: pxToRem(32px);
-}

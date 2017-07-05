@@ -27,6 +27,6 @@ npm run e2e
 npm test
 ```
 #项目采用vue框架  借助vue-cli脚手架 搭建项目
-#技术栈有 vue2.0+vue-router+axios(vue-resource的替代)+sass+webpack
+#技术栈有 vue2.0+vue-router+axios(vue-resource的替代)+sass+webpack+vonic(UI框架)
 #采用 lib-flexible 适配终端
 

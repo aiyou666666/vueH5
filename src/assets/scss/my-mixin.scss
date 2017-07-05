@@ -1,0 +1,28 @@
+@mixin color($color,$background){
+  color:$color;
+  background: $background;
+}
+@mixin height($height,$lineheight){
+  height:$height;
+  line-height: $lineheight;
+  text-align: center;
+  border-radius: 3px;
+  margin: 0 auto;
+}
+@mixin size($width,$height){
+  width:$width;
+  height:$height;
+}
+@mixin forget($top,$bottom,$width,$left,$size,$color){
+  margin: $top auto $bottom;
+  width: pxToRem($width);
+  text-align: $left;
+  font-size:pxToRem($size) ;
+  color: $color;
+}
+::-webkit-input-placeholder{
+  color: #bebebe;
+}
+.content{
+  padding-top: pxToRem(180px);
+}
