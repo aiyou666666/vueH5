@@ -29,14 +29,21 @@ module.exports = {
 		assetsPublicPath: '/',
 		/*代理服务器*/
 		proxyTable: {
-			/*'/api': {
-				target: 'http://your_website',
+			'/api/getsignature':{
+				target:'http://5377ce37.ngrok.io/',
 				changeOrigin: true,
 				pathRewrite: {
-					 //需要rewrite重写的, 如果在服务器端做了处理则可以不要这段
-					'^/api': ''
+					'^/api': '/'
 				}
-			}*/
+			},
+			'/api': {
+				target:'http://dev.aek.com:8081/',
+				changeOrigin: true,
+				pathRewrite: {
+					'^/api': '/api'
+				}
+			}
+
 
 		},
 		// CSS Sourcemaps off by default because relative paths are "buggy"

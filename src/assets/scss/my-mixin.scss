@@ -26,3 +26,35 @@
 .content{
   padding-top: pxToRem(180px);
 }
+@mixin background($uri){
+  background: url($uri) no-repeat;
+  background-size: pxToRem(44px) pxToRem(44px);
+  background-position: center 0;
+}
+@mixin cellLi($width){
+  display: inline-block;
+  width: $width;
+  text-align: center;
+  height: pxToRem(220px);
+  font-size: pxToRem(28px);
+  border-bottom: 1px solid #e5e5e5;
+  padding-top:pxToRem(57px);
+  color:#333;
+  img{
+    width:pxToRem(49px);
+    height:pxToRem(49px);
+  }
+}
+@mixin MsgList(){
+  padding-left:  pxToRem(30px);
+  background:#fff;
+  li{
+    border-bottom: 1px solid #e5e5e5;
+    height: pxToRem(90px);
+    line-height: pxToRem(90px);
+  }
+  border: {
+    top:1px solid #e5e5e5;
+    bottom:1px solid #e5e5e5;
+  };
+}

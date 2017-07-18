@@ -1,24 +1,93 @@
 <template>
-  <div>
+  <div class="name">
     <div class="content">
       <div class="loginImg"><img src="../assets/images/logo.png" alt=""></div>
       <div class="loginTitle">爱医康设备平台</div>
-      <div class="loginInput"><img src="../assets/images/yh.png" alt=""><input type="text" placeholder="手机号/邮箱"></div>
-      <div class="loginInput yanzhengma marginBottom"><img src="../assets/images/yzm.png" alt=""><input type="text" placeholder="验证码"><button>获取验证码</button></div>
-      <button-com>登录</button-com>
+      <div class="loginInput"><img src="../assets/images/yh.png" alt=""><input type="text" v-model="userphone" placeholder="手机号/邮箱"></div>
+      <div class="loginInput yanzhengma marginBottom">
+      	<img src="../assets/images/yzm.png" alt="">
+      	<input type="text" v-model="phonemsg" class="phonemessage" placeholder="验证码">
+      	<button @click="getCaptchaCode()" v-show="!isCountDown">获取验证码</button>
+        <input type="text" class="countdownInput" v-model="countDownTime" v-show="isCountDown" readonly="readonly" />
+      </div>
+      <button-com @click.native="messageLogin()">登录</button-com>
       <router-link class="changeMsg" to="/" tag="div">切换密码登录</router-link>
     </div>
   </div>
 </template>
 <script>
-  import ButtonCom from '../components/Button'
+  import Vue from 'vue'
+	import ButtonCom from '../components/Button'
+	import api from '../service/api.js'
+	import  utils from '../service/utils.js'
   export default{
-    components:{ButtonCom}
+    components:{ButtonCom},
+    data(){
+    	return {
+    		 userphone:'',     //手机号
+    		 phonemsg:'',      //短信验证码
+				 deviceId: utils.getDeviceUnqinId(), //设备唯一id
+				 countDownTime:60,        //倒计时的时间
+				 isCountDown:false,       //是否进行倒计时
+				 timeOut:null             //定时器
+    		 
+    	} 	
+    },
+    methods:{
+    	//获取短信验证码
+    	getCaptchaCode(){
+    		
+    		this.countDown()   //测试倒计时 这行代码到时需要删除
+    		
+    		api.getMsgCaptcha({
+    		 data:{
+    			"mobile":this.userphone,
+    			"deviceId":this.deviceId
+    		 },
+    		 headers:{'Content-Type':'application/x-www-form-urlencoded'}
+    		}).then(response=>{
+    			  /*倒计时*/
+    			  this.countDown()	
+    		})
+    	},
+    	//短信登录
+    	messageLogin(){	
+    		api.Login({
+    			data:{
+    				"username": this.userphone,
+						"password": this.phonemsg,
+						"deviceId": this.deviceId		
+    			}
+    		}).then(response=>{
+    			Vue.ls.set("X-AEK56-Token",response.token,response.expire)
+					this.$router.push({path:'/tabbar',query:{isLogin:true}})
+    		})
+     },
+     countDown(){
+     	 this.isCountDown=true
+     	 this.timeOut=setInterval(this.updataTime,1000)	 
+     },
+     updataTime(){
+     	 if(this.countDownTime<=0){
+     	 	   this.countDownTime=60
+     	 	   this.isCountDown=false
+     	 	   clearInterval(this.Interval)
+     	 }else{
+     	 	   this.countDownTime-- 	
+     	 }	
+     }
+    	
+    	
+    }
   }
 </script>
 <style lang="scss" scoped>
   @import "../assets/scss/reset.scss";
   @import "../assets/scss/my-mixin.scss";
+  .name{
+    height: 100%;
+    background: #fff;
+  }
   .loginImg{
     /*margin-top: 180px;*/
     text-align: center;
@@ -51,22 +120,40 @@
   }
   .yanzhengma{
     padding-right:0;
-  input{
+  input.phonemessage{
     width:  pxToRem(200px);
   }
   button{
     float: right;
-    background: #bebeb;
+    background-color: #f7931e;
     color: #fff;
     border: 0;
     height:  pxToRem(90px);
     font-size:pxToRem(32px) ;
-    padding: 0 15px;
+    /*padding: 0 15px;*/
     margin-top: -5px;
     border-radius: 3px;
+    width:pxToRem(200px); 
   }
   }
   .marginBottom{
        margin-bottom: pxToRem(120px);
+       position: relative;
+       .countdownInput{
+       	 position: absolute;
+       	 height:  pxToRem(90px);
+       	/* padding: 0 15px;*/
+       	 border: none;
+       	 margin-top: -5px;
+       	 border-radius: 3px;
+       	 color: #fff;
+       	 background-color:#BEBEBE;
+       	 float: right;
+       	 text-align: center;
+       	 font-size:pxToRem(32px);
+       	 margin-left: 0;
+       	 right: 0;
+       	 width:pxToRem(200px); 
+       }
      }
 </style>

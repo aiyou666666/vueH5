@@ -270,3 +270,12 @@ $uiWidth: 750px;   //设计稿
 @function pxToRem($px) {
     @return 10 * $px/$uiWidth * 1rem;
 }
+.back-transition { 
+  transition: transform .5s ease;
+}
+.back-enter{
+  transform: translate(100%,0);
+}
+.back-leave {
+  transform: translate(-100%,0);
+}
