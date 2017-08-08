@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from '../pages/Login'
+import Login from '../pages/bigLogin'
 import PageTransition from '../components/pageslider'
 
 Router.prototype.goBack = function() {
@@ -108,6 +108,18 @@ export default new Router({
       path: '/useMsg',
       component:resolve=>{
         require(['../pages/UserMsg'],resolve)
+      }
+    },
+    {
+      path: '/lookBigpircture',
+      component:resolve=>{
+        require(['../pages/lookBigpircture'],resolve)
+      }
+    },
+    {
+      path: '/noResult',
+      component:resolve=>{
+        require(['../pages/noResult'],resolve)
       }
     }
   ]

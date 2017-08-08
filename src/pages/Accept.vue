@@ -35,18 +35,17 @@
       <div class="startTitle"><span>服务评价</span><span>满意请给五星哦</span></div>
       <div class="startList">
         <ul>
-          <li v-for="(l, index1) in list"><span>{{l.name}}</span><span><i v-for="(n , index2) in l.number" :class="{default:!n,active:n}" @click="startClick(index1,index2)"></i></span><span class="startScore">{{l.score}}</span></li>
+          <li v-for="(l, index1) in list"><span>{{l.name}}</span><span><i v-for="(n , index2) in l.number" :class="{default:!n,startactive:n}" @click="startClick(index1,index2)"></i></span><span class="startScore">{{l.score}}</span></li>
         </ul>
       </div>
     </div>
     <div class="background"></div>
     <div class="decribe uploadImg">
       <span>备注</span>
-      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="assessComent" :disabled="numOver" @change="change()"></textarea>
+      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="assessComent" ></textarea>
       <span class="number"><i>{{assessComent.length}}</i>/300</span>
-
     </div>
-    <button-com class="btnLeave" @click.native="applyDone">提交</button-com>
+    <button-com class="btnLeave" @click.native="applyDone" :class="{active:isActive,btn:!isActive}">提交</button-com>
   </div>
 </template>
 <script>
@@ -79,7 +78,7 @@
         repairQuality:'',
         responseSpeed:'',
         checkStatus:'',
-        numOver:false
+        isActive:false
       }
     },
     components:{ButtonCom},
@@ -106,18 +105,25 @@
       applyDone(){
 //        this.popupVisible2 = true
 //        this.$router.push('/applyDone')
+        this.isActive=true
         if(this.resultTxt=='请选择验收结果'){
           Toast({
             message: '请选择验收结果',
             position: 'center',
             duration: 1500
           })
+          setTimeout(()=>{
+            this.isActive=false
+          },1000)
         } else if(this.statusTxt=='请选择设备维修后状态'){
           Toast({
             message: '请选择设备维修后状态',
             position: 'center',
             duration: 1500
           })
+          setTimeout(()=>{
+            this.isActive=false
+          },1000)
         }
         if(this.resultTxt!='请选择验收结果'&&this.statusTxt!='请选择设备维修后状态') {
           if(this.resultTxt=='验收通过'){
@@ -127,6 +133,9 @@
             this.checkStatus=2;
           }
           api.writeAccept({
+            headers:{
+              'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+            },
             method:'post',
             data:{
             "applyId": this.$route.query.id,
@@ -172,9 +181,6 @@
         }else{
           this.sheetVisible2=true
         }
-      },
-      change(){
-        this.numOver=false
       }
     },
     mounted(){
@@ -221,7 +227,7 @@
     watch: {
       assessComent: function (val) {
         if (val.length >= 300) {
-          this.numOver = true
+          this.assessComent=val.substr(0,300)
         }
       }
     }
@@ -326,7 +332,7 @@
     background: url("../assets/images/xxh.png");
     background-size:  pxToRem(32px)  pxToRem(32px);
   }
-  .active{
+  .startactive{
     background: url("../assets/images/xxhs.png");
     background-size:  pxToRem(32px)  pxToRem(32px);
   }
@@ -339,6 +345,6 @@
     margin-right:  pxToRem(30px);
     margin-top: pxToRem(-30px) ;
     float: right;
-    color: #666;
+    color: #bebebe;
   }
 </style>

@@ -3,16 +3,16 @@
     <router-view></router-view>
     <div class="footerHeight">
     <div class="footer">
-      <div class="icon">{{number}}</div>
       <ul>
         <router-link tag="li" v-for="l in list" :to="l.uri" :key="l.id">
           <i>{{l.name}}</i>
+          <!--<div class="icon"  v-bubble="{show:l.show,afterHide: (hide.bind(this,l)),value : msgNum}"   v-if="l.id==2&&(msgNum!=0||msgNum.data?msgNum.data!=0:'')" :class="{iconactive:msgNum>=100}">{{msgNum | msgNum}}</div>-->
+         <div class="icon"   v-if="l.id==2&&(msgNum!=0||msgNum.data?msgNum.data!=0:'')" :class="{iconactive:msgNum>=100}">{{msgNum | msgNum}}</div> 
         </router-link>
       </ul>
     </div>
   </div>
-  </div>
-
+ </div>
 </template>
 <script>
 	import Vue from 'vue'
@@ -26,24 +26,30 @@
 				list: [{
 					id: 1,
 					name: '首页',
-					uri: '/home'
+					uri: '/home',
+					show:false
 				}, {
 					id: 2,
 					name: '消息',
-					uri: '/message'
-				}]
+					uri: '/message',
+					show:true
+				}],
+        isActive:false,
+        msgNum:Vue.ls.get("msgNum")
 			}
+
 		},
-		created() {
-      api.msgNum({
-        param: {
-          id:this.$route.query.id
-        },
-        method:'get'
-      }).then(response => {
-          this.number=response
-      })
+		methods:{
+			hide(data) {
+        this.msgNum = 0
+        data['show'] = false
       }
+			
+			
+		}
+		
+		
+		
   }
 </script>
 <style scoped lang="scss">
@@ -61,13 +67,13 @@
     padding:pxToRem(7px) 0;
     background:#fff;
       li{
-        width: 8%;
+        width: 50%;
         float: left;
-        margin-left: 21%;
-        margin-right: 21%;
+        text-align: center;
         text-align: center;
         color:#333;
         height:  pxToRem(95px);
+        line-height:pxToRem(45px);
         i{
           margin-top:pxToRem(45px) ;
           display: block;
@@ -79,6 +85,7 @@
     }
   ul li:nth-child(2){
     @include background("../assets/images/xx.png")
+    position: relative;
   }
   ul li:nth-child(1).is-active{
     color:#f7931e;
@@ -92,11 +99,18 @@
     background: #ff2a2a;
     color: #fff;
     position: absolute;
-    z-index: 999;
-    font-size:pxToRem(18px) ;
+    font-size:pxToRem(20px) ;
     border-radius: 50%;
-    padding:0 pxToRem(5px) ;
-    right:17.9%;
-    top:-0.1%;
+    right:pxToRem(135px);
+    top:0;
+    width: pxToRem(34px);
+    height: pxToRem(34px);
+    text-align: center;
+    line-height: pxToRem(37px);
+  }
+  .iconactive{
+    width: pxToRem(52px);
+    border-radius:  pxToRem(25px);
+    right:pxToRem(116px);
   }
 </style>

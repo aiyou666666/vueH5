@@ -8,18 +8,17 @@
 	  namespace: 'vuejs__'
 	};
 	Vue.use(VueLocalStorage, options);
-
 	// axios 配置
-
 	axios.defaults.timeout = 5000
-	axios.defaults.headers.common['X-AEK56-Token'] = Vue.ls.get("X-AEK56-Token") || '' //设置统一的token
+	Vue.ls.get("X-AEK56-Token") && (axios.defaults.headers.common['X-AEK56-Token'] = Vue.ls.get("X-AEK56-Token") || '') //设置统一的token
 	axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
 	//axios拦截器  POST传参序列化
 	axios.interceptors.request.use((config) => {
-
+		//var currModule=  config.url.split("/")[1];
+		//config.url = ( currModule=='api_v3' || currModule=='getsignature') ? "/api" + config.url: "/api/" +currModule+ config.url;
 		config.url="/api"+config.url
 		if(config.method === 'post') {
-			//config.data = qs.stringify(config.data);     //不需要序列化
+			//config.data = qs.stringify(config.data);     //以表单(FormData)的形式提交
 		}else if(config.method==='get'){
 			config.params=config.data
 		}
@@ -39,17 +38,20 @@
 	//获取权限列表的的时候 成功状态 没有code 这里先做特殊处理
 
 	if(res.data.code!=200 && !res.data.id) {
+	  if(res.data.code==401){
+	   //
+      return ;
+    }
 		return Promise.reject(res);
 	}
 
 		return res;
 	}, (error) => {
-		// Toast({
-		// 	message: '网络异常',
-		// 	position: 'center',
-		// 	duration: 1500
-		// });
-    this.popupVisible2 = true
+		Toast({
+      message: '网络故障，请检查网络重试',
+      position: 'center',
+      duration: 1500
+    });
 		return Promise.reject(error);
 	});
 
@@ -64,18 +66,20 @@
 			 }).then(response => {
 					resolve(response.data.data || response.data)
 				}, err => {
+
 					Toast({
 						message: err.data.msg,
 						position: 'center',
 						duration: 1500
+                      })
 
-		          })
-				  //非法token
+                 //非法token
 		          if(res.data.code==450){
-
+		          	 Vue.ls.clear()
+		          	 Vue.$router.push('/')
 		          }
 				}).catch((error) => {
-
+         // 提交失败，请检查网络重试
 				});
 		})
 	}
@@ -85,20 +89,20 @@
 		 * @param{username,deviceId,password}
 		 */
 		Login(params) {
-			return fetch('/api_v3/auth', params)
+			return fetch('/oauth/auth', params)
 		},
 		/*
 		 * 退出登录
 		 */
 		 loginOut(params){
-		 	return fetch('/api_v3/logout-success',params)
+		 	return fetch('/oauth/logout-success',params)
 		 },
 		/*
 		 * 重置密码  获取短信验证码
 		 * @param{account}
 		 */
 		getCaptcha(params){
-			return fetch('/sys/index/sendCode/',params)
+			return fetch('/sys/index/sendCode',params)
 		},
 		/*
 		 *短信登录 获取验证码
@@ -107,7 +111,7 @@
 
 		getMsgCaptcha(params){
 
-			return fetch('/api_v3/sendLoginPwd',params)
+			return fetch('/oauth/sendLoginPwd',params)
 		},
 		/*
 		 * 重置密码
@@ -121,7 +125,7 @@
 		 * @param{}
 		 */
 		getPermissionList(params){
-		   return fetch('/api_v3/cache/permission/list',params)
+		   return fetch('/oauth/cache/permission/list',params)
 		},
 		/*
 		 *获取各种状态的列表（除了带验收的）
@@ -197,7 +201,7 @@
      *查询未读消息数量
      * @param{}
      */
-    msgNum(params){
+    msgNumfind(params){
       return fetch('/repair/repMessageReceive/find',params)
   },
     /*
@@ -205,7 +209,7 @@
      * @param{}
      */
     statusNum(params){
-      return fetch('/repair/apply/total/'+params.params.id,params)
+      return fetch('/repair/apply/total/'+params.param.id,params)
     },
     /*
      *查询消息列表
@@ -233,8 +237,29 @@
      * @param {id}
      */
     getDeviceDetail(params){
-    	return fetch('/assets/pmAssetsInfo/getAssetsDetail',params)	
-    } 
-    
-	}
+    	return fetch('/assets/assetsInfo/getAssetsDetail',params)
+    },
+    /*
+     *上传图片
+     * @params{files}
+     */
+     uplopadImg(params){
+     	 return fetch('/upload/upload'+params.params.id,params)
+     },
+    /*
+     * 已读消息
+     * @param {id}
+     */
+    getReadMsg(params){
+      return fetch('/repair/repMessageReceive/read',params)
+    },
+    /*
+     * 用户详情
+     * @param {id}
+     */
+    getUserDetail(params){
+      return fetch('/sys/user/'+params.param.id,params)
+    }
+
+}
 

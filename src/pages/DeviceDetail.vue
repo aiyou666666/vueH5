@@ -5,7 +5,7 @@
       <ul>
         <li >
           <img src="../assets/images/sbxq.png" alt="">
-          <span>设备详情</span>
+          <span>故障详情</span>
         </li>
       </ul>
     </div>
@@ -16,7 +16,7 @@
           <span>维修单号</span><span>{{msgList.applyNo}}</span>
         </li>
         <li>
-          <span>申请时间</span><span>{{msgList.reportRepairDate}}</span>
+          <span>申请时间</span><span>{{msgList.reportRepairDate | timeChange}}</span>
         </li>
       </ul>
     </div>
@@ -24,7 +24,7 @@
     <div class="msgList">
       <ul>
         <li >
-          <span>设备编号</span><span>{{msgList.factoryNum}}</span>
+          <span>设备编号</span><span>{{msgList.assetsNum}}</span>
         </li>
         <li>
           <span>设备名称</span><span>{{msgList.assetsName}}</span>
@@ -47,7 +47,7 @@
     </div>
     <div class="background"></div>
     <div class="msgCard">
-      <span >设备图片</span>
+      <span >故障图片</span>
       <!--<img src="../assets/images/11.png" alt="">-->
       <img src="../assets/images/11.png" alt="" v-if="!msgList.assetsImg">
       <img :src="msgList.assetsImg | showImage" alt="" v-else>
@@ -67,6 +67,9 @@
       api.getDetail({
         param: {
           id:this.$route.query.id
+        },
+        headers:{
+          'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
         },
         method:'get'
       }).then(response => {

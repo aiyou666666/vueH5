@@ -65,6 +65,7 @@
   import Vue from 'vue'
   import api from '../service/api.js'
   import DeviceCard from '../components/DeviceCard'
+ 
   export default{
     data(){
       return{
@@ -88,9 +89,9 @@
           statusList:['全部状态','已现场解决','已维修待验收'],
           pageNo:1,
           allLoaded:false,
-          loadmore:'加载中',
           nodata:false,
-          userInfo: Vue.ls.get("useInfo")
+          userInfo: Vue.ls.get("useInfo"),
+          status:''
       }
     },
     components:{DeviceCard},
@@ -105,16 +106,21 @@
                 'isAsc':false,
                 'orderByField':this.orderByField,
                 'urgentLevel':this.urgentLevel,
+                'status':this.status,
                 'pageSize':6,
-                'pageNo':this.pageNo
+                'pageNo':this.pageNo,
+                'tenantId':this.userInfo.tenantId
+              },
+              headers:{
+              	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
               },
               method:'get'
             }).then(response => {
               if(response.records.length==0){
                 this.nodata = true;// 若数据已全部获取完毕
-                this.loadMore=true;
+                this.loading=true;
               }else{
-                this.loadMore=false;
+                this.loading=false;
                 this.list=this.list.concat(response.records)
               }
             })
@@ -126,10 +132,14 @@
               'status': this.$route.query.status,
               'urgentLevel': this.urgentLevel,
               'pageSize': 6,
-              'pageNo': this.pageNo
+              'pageNo': this.pageNo,
+              'tenantId':this.userInfo.tenantId
             },
+            headers:{
+              	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+             },
             method: 'get'
-          }).then(response => {
+          }).then(response=> {
             if (response.records.length == 0) {
               this.nodata = true;// 若数据已全部获取完毕
               this.loading=true;
@@ -144,7 +154,6 @@
       timeClick(){
           this.pageNo=1
           this.nodata=false
-          this. loadMore()
           document.getElementsByTagName('body')[0].scrollTop=0
           this.applytime=true
           this.hurrey=false
@@ -152,32 +161,32 @@
           this.txtModal='申请时间'
           this.orderByField='report_repair_date'
           if(this.$route.query.status==10){
-            this.ajaxAccept(this.orderByField,'','')
+            this.ajaxAccept(this.orderByField,this.urgentLevel,this.status,'')
           }else{
-            this.ajax(this.orderByField,this.$route.query.status,'','')
+            this.ajax(this.orderByField,this.$route.query.status,this.urgentLevel,'')
           }
+          this. loadMore()
       },
       hurreyClick(){
           this.pageNo=1
           this.nodata=false
           document.getElementsByTagName('body')[0].scrollTop=0
-          this. loadMore()
           this.applytime=false
           this.hurrey=true
           this.timeModal=false
           this.txtModal='紧急程度'
           this.orderByField='urgent_level'
           if(this.$route.query.status==10){
-            this.ajaxAccept(this.orderByField,'','')
+            this.ajaxAccept(this.orderByField,this.urgentLevel,this.status,'')
           }else{
-            this.ajax(this.orderByField,this.$route.query.status,'','')
+            this.ajax(this.orderByField,this.$route.query.status,this.urgentLevel,'')
           }
+          this. loadMore()
       },
       morenClick(index,l){
         document.getElementsByTagName('body')[0].scrollTop=0
         this.pageNo=1
         this.nodata=false
-        this. loadMore()
         if(index==0){
           this.urgentLevel=''
         }else if(index==1){
@@ -193,22 +202,28 @@
           this.morentxtModal=l
           this.morenModal=false
           if(this.$route.query.status==10){
-            this.ajaxAccept(this.orderByField,this.urgentLevel,'')
+            this.ajaxAccept(this.orderByField,this.urgentLevel,this.status,'')
           }else{
             this.ajax(this.orderByField,this.$route.query.status,this.urgentLevel,'')
           }
+        this.loadMore()
       },
       statusClick(index,l){
+          document.getElementsByTagName('body')[0].scrollTop=0
+          this.pageNo=1
+          this.nodata=false
           this.statusIndex=index
           this.statustxtMOdal=l
           this.statusModal=false
-        if(index==0){
-          this.ajaxAccept(this.orderByField,this.urgentLevel,'')
-        }else if(index==1){
-          this.ajax(this.orderByField,2,this.urgentLevel,'')
-        }else{
-          this.ajax(this.orderByField,4,this.urgentLevel,'')
-        }
+          if(index==0){
+            this.status=''
+          }else if(index==1){
+            this.status=2
+          }else{
+            this.status=4
+          }
+          this.ajaxAccept(this.orderByField,this.urgentLevel,this.status,'')
+          this.loadMore()
       },
       ajax(orderByField,status,urgentLevel,pageNo){
         api.getMsgList({
@@ -221,20 +236,27 @@
             'pageNo':pageNo,
             'tenantId':this.userInfo.tenantId
           },
+          headers:{
+            'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+          },
           method:'get'
         }).then(response => {
           this.list=response.records
         })
       },
-      ajaxAccept(orderByField,urgentLevel,pageNo){
+      ajaxAccept(orderByField,urgentLevel,status,pageNo){
         api.getacceptMsgList({
           data: {
             'isAsc':false,
             'orderByField':orderByField,
             'urgentLevel':urgentLevel,
+            'status':status,
             'pageSize':6,
             'pageNo':pageNo,
             'tenantId':this.userInfo.tenantId
+          },
+          headers:{
+            'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
           },
           method:'get'
         }).then(response => {
@@ -245,7 +267,7 @@
     created(){
       if(this.$route.query.status==10){
         this.accept=true
-        this.ajaxAccept(this.orderByField,'','')
+        this.ajaxAccept(this.orderByField,'',this.status,'')
       }else{
         this.ajax(this.orderByField,this.$route.query.status,'','')
       }
@@ -322,28 +344,5 @@
   }
   .background{
     height: pxToRem(80px);
-  }
-  .loadMore{
-    height:pxToRem(50px) ;
-    background:#eff3f6;
-    text-align: center;
-    img{
-      width:pxToRem(130px);
-      height:pxToRem(20px);
-    }
-  }
-  .nodata{
-    height: 94%;
-    background: #fff;
-    padding-top:40%;
-    text-align:center;
-    img{
-      width: pxToRem(200px);
-      height: pxToRem(170px);
-    }
-    div{
-      font-size:pxToRem(28px) ;
-      color: #666;
-    }
   }
 </style>

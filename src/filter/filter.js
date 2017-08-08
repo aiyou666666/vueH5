@@ -1,7 +1,7 @@
 import Vue from 'vue'
 Vue.filter('machineName',value=>{
   if(value&&value.length>11){
-      return value.substr(0,10)+'...'
+    return value.substr(0,10)+'...'
   }else{
     return value
   }
@@ -21,7 +21,7 @@ Vue.filter('timeChange',value=>{
     var h = time.getHours();
     var mm = time.getMinutes();
     var s = time.getSeconds();
-    return y+'-'+m+'-'+d+' '+h+':'+mm+':'+s;
+    return y+'-'+(m<10?'0'+m:m)+'-'+(d<10?'0'+d:d)+' '+(h<10?'0'+h:h)+':'+(mm<10?'0'+mm:mm)+':'+(s<10?'0'+s:s);
 })
 Vue.filter('statusChange',value=>{
     if(value==1){
@@ -75,6 +75,28 @@ Vue.filter('acceptChange',value=>{
 Vue.filter('showImage',value=>{
     var list = value.split(',');
     return list[0];
+})
+Vue.filter('msgNum',value=>{
+  if(value>=100){
+    return '99+'
+  }else{
+    return value
+  }
+
+})
+Vue.filter('homeName',value=>{
+  if(value&&value.length>6){
+    return value.substr(0,6)+'...'
+  }else{
+    return value
+  }
+})
+Vue.filter('homeDept',value=>{
+  if(value&&value.length>10){
+    return value.substr(0,10)+'...'
+  }else{
+    return value
+  }
 })
 
 

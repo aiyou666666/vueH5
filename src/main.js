@@ -9,13 +9,17 @@ import axios from 'axios'
 import FastClick from 'fastclick'
 import VueLocalStorage from 'vue-ls'   //本地存储
 import 'mint-ui/lib/style.css'    //样式需要单独引用
-import { Actionsheet ,Popup ,DatetimePicker,InfiniteScroll,Loadmore} from 'mint-ui'
-
+import vueBubble from 'vue-bubble'
+import { Actionsheet ,Popup ,DatetimePicker,InfiniteScroll,Loadmore,Swipe, SwipeItem} from 'mint-ui'
 Vue.component(Actionsheet.name, Actionsheet);
 Vue.component(Popup.name, Popup);
 Vue.component(DatetimePicker.name, DatetimePicker);
 Vue.component(Loadmore.name, Loadmore);
+Vue.component(Swipe.name, Swipe);
+Vue.component(SwipeItem.name, SwipeItem);
 Vue.use(InfiniteScroll);
+Vue.use(vueBubble)
+
 Vue.prototype.axios = axios
 Vue.config.productionTip = false
 	let options = {
@@ -35,3 +39,5 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
+

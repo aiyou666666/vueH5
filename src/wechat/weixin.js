@@ -9,7 +9,7 @@ export default {
 			}
 		}).then(response => {
 			wx.config({
-				debug: true,
+				debug:false,
 				appId: response.appId,
 				timestamp: response.timestamp,
 				nonceStr: response.nonceStr,

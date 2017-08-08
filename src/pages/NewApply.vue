@@ -1,5 +1,6 @@
 <template>
-  <div >
+  <div style="background: #eff3f6;padding-bottom: 30px">
+    <div v-show="hasID">
       <mt-popup v-model="popupVisible2" position="top" class="mint-popup-2" :modal="false">
         <p ><img src="../assets/images/fail.png" alt=""><span>提交失败，请检查网络重试</span></p>
       </mt-popup>
@@ -24,7 +25,7 @@
         </li>
         <li>
         	<input type="hidden" v-model="applyInfo.deptId"/>
-          <span>所在部门</span><i>{{applyInfo.deptName}}</i>
+          <span>所在部门</span><i>{{applyInfo.assetsDeptName}}</i>
         </li>
         <li>
         	<input type="hidden" v-model="applyInfo.assetsSpec"/>
@@ -36,22 +37,31 @@
     <div class="msgList">
       <ul>
         <li  @click="sheet">
-          <span>紧急程度</span><i :class="{urgencyColor:isColor}" class="ichoose">{{this.applyInfo.txtUrgency | urgentLevel}}</i>
+          <span>紧急程度</span><i :class="{urgencyColor:isColor}" class="ichoose">{{applyInfo.urgentLevel | urgentLevel}}</i>
           <img src="../assets/images/jr.png" alt="" class="choose">
         </li>
       </ul>
     </div>
     <div class="background"></div>
-    <div class="uploadImg">
+    <div class="uploadImg" style="width: 100%;overflow: hidden">
       <span>设备图片</span>
-     <img   src="../assets/images/tjtp.png"  alt=""  @click="chooseImg()">
+      <uploader   :imgArr.sync="imgList"  :src="'/api/upload/upload'" :urgentLevel="applyInfo.urgentLevel" :faultDesc="applyInfo.faultDesc"></uploader>
     </div>
     <div class="background"></div>
     <div class="decribe uploadImg">
       <span>故障描述</span>
-      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="applyInfo.faultDesc"></textarea>
+      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="applyInfo.faultDesc" ></textarea>
+      <span class="number"><i>{{applyInfo.faultDesc.length}}</i>/300</span>
     </div>
-    <button-com class="btnLeave" @click.native="applyDone">提交维修申请</button-com>
+    <button-com  @click.native="applyDone"  :class="{active:isActive,btn:!isActive}" >提交维修申请</button-com>
+ </div>
+    <div v-show="!hasID">
+      <div class="noresult">
+        <img src="../assets/images/noresult.png" alt="">
+        <div>无法获取设备信息，请检查二维码</div>
+      </div>
+      <button-com class="btnLeave" @click.native="goHome"  :class="{active:isActive,btn:!isActive}">返回主页</button-com>
+    </div>
   </div>
 </template>
 <script>
@@ -61,9 +71,12 @@
   import ButtonCom from '../components/Button'
   import wxInit  from  '../wechat/weixin.js'
   import wx from 'weixin-js-sdk'
+  import uploader from '../components/uploader'
   export default{
     data(){
       return{
+        hasID:true,
+        isActive:false,
         sheetVisible :false,
         sheetVisible2 :false,
         popupVisible2:false,
@@ -71,13 +84,18 @@
         actions:[],
         actions2:[],
         assetsImgsrc:'',
+        imgList:[],
         applyInfo:{
+          faultDesc:''
 
         }
       }
     },
-    components:{ButtonCom},
+    components:{ButtonCom,uploader},
     created (){
+      if(Vue.ls.get("urgentLevel")){
+        this.isColor=true
+      }
     	api.getDeviceDetail({
     	   data: {
           id:this.$route.query.id
@@ -87,25 +105,46 @@
     	  this.applyInfo={
     	  	assetsNum:data.assetsNum,  //设备编号
     	  	assetsName:data.assetsName, //设备名称
-    	  	deptName:data.deptName,     //设备部门
+          assetsDeptName:data.deptName,     //设备部门
     	  	assetsSpec:data.assetsSpec,   //设备型号
     	  	assetsId:data.assetsId,       //设备id
-    	  	faultDesc:'',                 //故障描述
-    	  	assetsImg:'',                 //设备图片
-    	  	txtUrgency:'请选择',            //紧急程度
+    	  	faultDesc:Vue.ls.get("faultDesc"),                 //故障描述
+    	  	assetsImg:this.imgList,       //设备图片
+          urgentLevel:Vue.ls.get("urgentLevel")?Vue.ls.get("urgentLevel"):'请选择',            //紧急程度
     	  	tenantId:Vue.ls.get("useInfo").tenantId //机构id
     	  }
     	})
     },
     methods:{
+      goHome(){
+        this.isActive=true
+        this.$router.push('/tabbar')
+      },
       applyDone(){
-        if(this.txtUrgency=='请选择'){
+        this.isActive=true
+        if(this.applyInfo.urgentLevel=='请选择'){
           Toast({
             message: '请选择紧急程度',
             position: 'center',
             duration: 1500
           })
-        }else{
+          setTimeout(()=>{
+            this.isActive=false
+          },1000)
+        }
+        if(this.applyInfo.faultDesc==''){
+          Toast({
+            message: '请填写故障描述',
+            position: 'center',
+            duration: 1500
+          })
+          setTimeout(()=>{
+            this.isActive=false
+          },1000)
+        }
+        if(this.applyInfo.urgentLevel !='请选择'&&this.applyInfo.faultDesc!=''){
+        	//对图片进行切割
+        	this.applyInfo.assetsImg=(this.imgList.length && this.imgList.join(',')) ||''
           api.newApply({
             method:'post',
             data:this.applyInfo
@@ -120,25 +159,24 @@
       chooseImg(){
 
       }
-
     },
     mounted(){
       this.actions=[
         {name:'非常紧急',method:()=>{
             this.isColor=true,
-            this.applyInfo.txtUrgency=4
+            this.applyInfo.urgentLevel=4
       }},
         {name:'紧急',method:()=>{
             this.isColor=true,
-            this.applyInfo.txtUrgency=3
+            this.applyInfo.urgentLevel=3
         }},
         {name:'一般',method:()=>{
             this.isColor=true,
-            this.applyInfo.txtUrgency=2
+            this.applyInfo.urgentLevel=2
         }},
         {name:'不紧急',method:()=>{
             this.isColor=true,
-            this.applyInfo.txtUrgency=1
+            this.applyInfo.urgentLevel=1
         }}]
     },
     watch: {
@@ -148,8 +186,16 @@
             this.popupVisible2 = false;
           }, 2000);
         }
-      }
-    },
+      },
+    applyInfo:{
+      handler(newValue, oldValue) {
+        if(newValue.faultDesc.length>=300){
+          this.applyInfo.faultDesc=newValue.faultDesc.substr(0,300)
+        }
+      },
+      deep: true
+    }
+    }
   }
 </script>
 <style scoped lang="scss">
@@ -193,10 +239,9 @@
   }
   .uploadImg{
     font-size: pxToRem(28px);
-    padding-left:  pxToRem(30px);
-    padding-top:  pxToRem(30px);
+    padding:  pxToRem(30px) 0 pxToRem(30px) pxToRem(30px);
     background: #fff;
-    height: pxToRem(208px) ;
+    min-height: pxToRem(275px) ;
     span{
       margin-right: pxToRem(70px);
       float: left;
@@ -215,6 +260,12 @@
     resize: none;
     color: #666;
     line-height:pxToRem(48px) ;
+  }
+  .decribe .number{
+    margin-right:  pxToRem(30px);
+    margin-top: pxToRem(-30px) ;
+    float: right;
+    color: #bebebe;
   }
 
 </style>

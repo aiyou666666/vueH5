@@ -2,10 +2,10 @@
   <div>
     <div class="MsgList" :class="{weidu:message.messageStatus==1}">
       <ul>
-        <li class="MsgFirst"><span>{{message.messageContent}}</span><span :class="{noUrgent:message.messageLevel==1||message.messageLevel==2,Urgent:message.messageLevel==3,veryUrgent:message.messageLevel==4}">{{message.messageLevel |　urgentLevel}}</span></li>
-        <li class="MsgSecond"><span>{{message.assetsName  | machineName}}</span><span>{{message.assetsDeptName  | officeName}}</span>
+        <li class="MsgFirst" :class="{weidu:message.messageStatus==1}"><span>{{message.messageContent}}</span><span :class="{noUrgent:message.messageLevel==1||message.messageLevel==2,Urgent:message.messageLevel==3,veryUrgent:message.messageLevel==4,yidu:message.messageStatus==1}">{{message.messageLevel |　urgentLevel}}</span></li>
+        <li class="MsgSecond" :class="{weidu:message.messageStatus==1}"><span>{{message.assetsName  | machineName}}</span><span>{{message.assetsDeptName  | officeName}}</span>
           <img src="../assets/images/jr.png" alt=""></li>
-        <li class="MsgLast"><span>{{message.messageTime | timeChange}}</span></li>
+        <li class="MsgLast" :class="{weidu:message.messageStatus==1}"><span>{{message.messageTime | timeChange}}</span></li>
       </ul>
     </div>
     <div class="background"></div>
@@ -14,6 +14,7 @@
 <script>
     export default{
         props:['message'],
+        created(){}
     }
 </script>
 <style lang="scss" scoped>
@@ -41,7 +42,7 @@
     color: #333;
   }
   .weidu{
-    color: #999;
+    color: #999 !important;
   }
   .MsgFirst span:first-child{
     width: pxToRem(560px) ;
@@ -70,6 +71,8 @@
       float: right;
       width: pxToRem(15px);
       height:pxToRem(28px);
+      display: inline-block;
+      margin-top:pxToRem(10px) ;
     }
   }
   .MsgLast{
@@ -89,5 +92,8 @@
   }
   .MsgList li  .noUrgent{
     background: #63bd90;
+  }
+  .MsgList li .yidu{
+    background: #bebebe;
   }
   </style>

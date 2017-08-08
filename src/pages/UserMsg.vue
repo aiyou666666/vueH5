@@ -5,7 +5,7 @@
       <ul>
         <li class="firstLi">
           <div>{{userInfo.realName}}</div>
-          <div><span>{{userInfo.deptName}}</span><span>{{userInfo.jobName}}</span></div>
+          <div><span style="float: left">{{userInfo.deptName}}</span><span style="float: right">{{currentUser.jobName}}</span></div>
         </li>
         <li>
           <span>所属机构</span><span>{{userInfo.tenantName}}</span>
@@ -16,7 +16,7 @@
     <div class="msgList">
       <ul>
         <li>
-          <span>ID</span><span>12</span>
+          <span>ID</span><span>{{userInfo.id}}</span>
         </li>
         <li>
           <span>手机号</span><span>{{userInfo.mobile}}</span>
@@ -26,7 +26,7 @@
         </li>
       </ul>
     </div>
-    <button-com class="btnLeave" @click.native="loginout">退出登录</button-com>
+    <button-com class="btnLeave" @click.native="loginout" :class="{active:isActive,btn:!isActive}">退出登录</button-com>
   </div>
 </template>
 <script>
@@ -36,16 +36,23 @@
     export default{
       data(){
         return{
-          userInfo: Vue.ls.get("useInfo")
+          userInfo: Vue.ls.get("useInfo"),
+          isActive:false,
+          currentUser:Vue.ls.get("currentuseInfo")
         }
       },
       components:{ButtonCom},
       methods:{
         loginout(){
-           	    api.loginOut()
-           	   Vue.ls.remove("X-AEK56-Token")
-           	   this.$router.push('/')
-
+               this.isActive=false
+               api.loginOut({
+               headers:{
+              	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+               }
+               }).then(response=>{
+               	   Vue.ls.clear()
+           	       this.$router.push('/')
+               })
            }
 
       }
@@ -92,6 +99,6 @@
     color: #333;
   }
   .btnLeave{
-    margin-top: pxToRem(55px);
+    margin-top: pxToRem(55px) !important;
   }
 </style>

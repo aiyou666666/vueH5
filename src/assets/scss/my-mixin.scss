@@ -32,7 +32,7 @@
   background-position: center 0;
 }
 @mixin cellLi($width){
-  display: inline-block;
+  float: left;
   width: $width;
   text-align: center;
   height: pxToRem(220px);
@@ -58,3 +58,57 @@
     bottom:1px solid #e5e5e5;
   };
 }
+.loadMore{
+  height:pxToRem(50px) ;
+  background:#eff3f6;
+  text-align: center;
+  color:#999;
+  font-size:pxToRem(20px);
+  img{
+    width:pxToRem(130px);
+    height:pxToRem(20px);
+  }
+}
+.nodata{
+  height: 94%;
+  background: #fff;
+  padding-top:40%;
+  text-align:center;
+  img{
+    width: pxToRem(200px);
+    height: pxToRem(170px);
+  }
+  div{
+    font-size:pxToRem(28px) ;
+    color: #999;
+  }
+}
+.active {
+  @include color(#fff,#faae5c);
+  font-size: pxToRem(32px);
+  @include height(40px,40px);
+  width: pxToRem(560px);
+  margin-bottom: pxToRem(30px);
+}
+.btn {
+  font-size: pxToRem(32px);
+  @include color(#fff,#f7931e);
+  @include height(40px,40px);
+  width: pxToRem(560px);
+  margin-bottom: pxToRem(30px);
+}
+.noresult{
+    padding-top:40%;
+    text-align:center;
+    img{
+      width: pxToRem(200px);
+      height: pxToRem(170px);
+    }
+    div{
+      font-size:pxToRem(28px) ;
+      color: #999;
+      margin-top: pxToRem(70px);
+      margin-bottom: pxToRem(400px);
+    }
+  }
+

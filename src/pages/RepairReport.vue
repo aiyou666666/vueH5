@@ -48,17 +48,17 @@
     <div class="background"></div>
     <div class="msgList">
       <ul>
-        <li><span>维修费</span><input type="text" placeholder="请输入" v-model="repairCost"></li>
-        <li><span>材料费</span><input type="text" placeholder="请输入" v-model="partsCost"></li>
+        <li><span>维修费</span><input type="number" placeholder="请输入" v-model="repairCost"></li>
+        <li><span>材料费</span><input type="number" placeholder="请输入" v-model="partsCost"></li>
       </ul>
     </div>
     <div class="background"></div>
     <div class="decribe uploadImg">
       <span>备注</span>
-      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="repairComent" :disabled="numOver" @change="change()"></textarea>
+      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="repairComent" ></textarea>
       <span class="number"><i>{{repairComent.length}}</i>/300</span>
     </div>
-    <button-com class="btnLeave" @click.native="repairSubmit">提交</button-com>
+    <button-com class="btnLeave" @click.native="repairSubmit" :class="{active:isActive,btn:!isActive}">提交</button-com>
   </div>
 </template>
 <script>
@@ -68,104 +68,127 @@
   import ButtonCom from '../components/Button'
   export default{
     data(){
-      return{
+      return {
         value: new Date(),
         value2: new Date(),
-        sheetVisible :false,
-        popupVisible2:false,
-        actions:[],
-        repairstatusTxt:'请选择维修后状态',
-        isColor:false,
-        startTime:'',
-        endTime:new Date(),
+        sheetVisible: false,
+        popupVisible2: false,
+        actions: [],
+        repairstatusTxt: '请选择维修后状态',
+        isColor: false,
+        startTime: '',
+        endTime: new Date(),
         repairCost:'',
-        partsCost:'',
-        repairComent:'',
-        key:'',
-        data:'',
-        numOver:false
+        partsCost: '',
+        repairComent: '',
+        key: '',
+        data: '',
+        isActive:false
       }
     },
-    components:{ButtonCom},
+    components: {ButtonCom},
     created(){
       api.getProcess({
         param: {
-          id:this.$route.query.id
+          id: this.$route.query.id
         },
-        method:'get'
+        headers:{
+          'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+        },
+        method: 'get'
       }).then(response => {
-        this.process=response
-        this.startTime=this.process.reportRepairDate
+        this.process = response
+        this.startTime = this.process.reportRepairDate
       })
     },
-    methods:{
+    methods: {
       repairSubmit(){
-        if(this.repairstatusTxt=='请选择维修后状态'){
+        this.isActive=true
+        if (this.repairstatusTxt == '请选择维修后状态') {
           Toast({
             message: '请选择维修后状态',
             position: 'center',
             duration: 1500
           })
-        }else if(!this.repairCost){
+          setTimeout(()=>{
+            this.isActive=false
+        },1000)
+        } else if (!this.repairCost) {
           Toast({
             message: '请填写维修费用',
             position: 'center',
             duration: 1500
           })
-        }else if(!this.partsCost){
+          setTimeout(()=>{
+            this.isActive=false
+        },1000)
+        } else if (!this.partsCost) {
           Toast({
             message: '请填写材料费用',
             position: 'center',
             duration: 1500
           })
-        }else{
+          setTimeout(()=>{
+            this.isActive=false
+        },1000)
+        } else {
           api.writeReport({
-            method:'post',
-            data:{
-            "applyId":this.$route.query.id ,
-            "partsCost": this.partsCost*100,
-            "repairComent": this.repairComent,
-            "repairCost": this.repairCost*100,
-            "repairPeriodEnd": this.endTime,
-            "repairPeriodStart": this.startTime,
-            "repairResultKey": this.key,
+            headers:{
+              'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+            },
+            method: 'post',
+            data: {
+              "applyId": this.$route.query.id,
+              "partsCost": this.partsCost * 100,
+              "repairComent": this.repairComent,
+              "repairCost": this.repairCost * 100,
+              "repairPeriodEnd": this.endTime,
+              "repairPeriodStart": this.startTime,
+              "repairResultKey": this.key,
             }
-          }).then(response => {
-            this.$router.push({ path: '/applyDone', query: { flag: 3 ,id:this.$route.query.id}})
           })
+            .then(response => {
+            if(this.$route.query.other == 1){
+            this.$router.push({path: '/applyDone', query: {flag: 1, id: this.$route.query.id, backIdenify: 1}})
+          }else{
+            this.$router.push({path: '/applyDone', query: {flag: 3, id: this.$route.query.id}})
+          }
+        })
         }
       },
       sheet(){
-          this.sheetVisible = true
+        this.sheetVisible = true
       },
       open(picker) {
-          this.$refs[picker].open();
+        this.$refs[picker].open();
       },
       handleChange(value) {
-          this.startTime=value
+        this.startTime = value
       },
       handleChange2(value) {
-          this.endTime = value
-      },
-      change(){
-        this.numOver=false
+        this.endTime = value
       }
     },
     mounted(){
-      api. lookDictionary({
+      api.lookDictionary({
         param: {
-          id:8
+          id: 8
         },
-        method:'get'
+        headers:{
+          'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+        },
+        method: 'get'
       }).then(response => {
-        this.data=response
-        const dataLength=this.data.length
-        for(let i=0;i<dataLength;i++){
-         let obj={name:this.data[i].name,method:()=>{
-            this.isColor=true
-            this.repairstatusTxt=this.data[i].name
-            this.key=this.data[i].key
-          }}
+        this.data = response
+        const dataLength = this.data.length
+        for (let i = 0; i < dataLength; i++) {
+          let obj = {
+            name: this.data[i].name, method: ()=> {
+              this.isColor = true
+              this.repairstatusTxt = this.data[i].name
+              this.key = this.data[i].key
+            }
+          }
           this.actions.push(obj)
         }
       })
@@ -175,9 +198,15 @@
         if (val.length >= 300) {
           this.numOver = true
         }
+      },
+      repairCost: function (val) {
+          this.repairCost = Number(val).toFixed(2)
+      },
+      partsCost: function (val) {
+          this. partsCost = Number(val).toFixed(2)
       }
     }
-    }
+  }
 </script>
 <style scoped lang="scss">
   @import "../assets/scss/reset.scss";
@@ -246,6 +275,6 @@
     margin-right:  pxToRem(30px);
     margin-top: pxToRem(-30px) ;
     float: right;
-    color: #666;
+    color: #bebebe;
   }
 </style>

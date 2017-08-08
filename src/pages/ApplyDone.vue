@@ -31,7 +31,8 @@
     </div>
     <div class="background"></div>
     <div class="msgCard">
-      <img src="../assets/images/11.png" alt="">
+      <img src="../assets/images/11.png" alt="" v-if="!msg.assetsImg">
+      <img :src="msg.assetsImg | showImage" alt="" v-else>
       <span>
         <ul class="cardList" @click="detail">
             <li>{{msg.assetsName | machineName}}<span class="duge" :class="{noUrgent:msg.urgentLevel==1||msg.urgentLevel==2,Urgent:msg.urgentLevel==3,veryUrgent:msg.urgentLevel==4}">{{msg.urgentLevel | urgentLevel}}</span></li>
@@ -40,15 +41,18 @@
         </ul>
       </span>
     </div>
-    <button-com class="btnLeave" @click.native="goList" v-if="this.$route.query.flag==10">返回验收列表</button-com>
-    <button-com class="btnLeave" @click.native="goList" v-if="this.$route.query.flag==3">返回维修列表</button-com>
-    <button-com class="btnLeave" @click.native="goAccept" v-if="(msg.status==2||msg.status==4)&&!this.$route.query.flag">验收
+    <button-com class="btnLeave" @click.native="goList" v-if="this.$route.query.flag==10" :class="{active:isActive,btn:!isActive}">返回验收列表</button-com>
+    <button-com class="btnLeave" @click.native="goList" v-if="this.$route.query.flag==3&&!this.$route.query.backIdenify" :class="{active:isActive,btn:!isActive}">返回维修列表</button-com>
+    <button-com class="btnLeave" @click.native="goAccept" v-if="(msg.status==2||msg.status==4)&&!this.$route.query.flag" :class="{active:isActive,btn:!isActive}">验收
     </button-com>
-    <button-com class="btnLeave" @click.native="goRepair" v-if="msg.status==3&&!this.$route.query.flag">填写维修报告单
+    <button-com class="btnLeave" @click.native="goRepair" v-if="msg.status==3&&!this.$route.query.flag&&userInfo.authoritiesStr.indexOf('REP_APPLY_REPAIR') != -1" :class="{active:isActive,btn:!isActive}">填写维修报告单
     </button-com>
-    <button-com class="btnLeave" @click.native="goList" v-if="this.$route.query.flag==1">返回故障鉴定列表</button-com>
-    <button-com class="btnLeave" @click.native="goIdenfy" v-if="msg.status==1&&this.$route.query.newApply!=1">故障鉴定</button-com>
-    <button-com class="btnLeave" @click.native="goHome" v-if="this.$route.query.newApply==1">返回主页</button-com>
+    <button-com class="btnLeave" @click.native="goRepairother" v-if="this.$route.query.flag==1&&this.$route.query.localhost==1&&userInfo.authoritiesStr.indexOf('REP_APPLY_REPAIR') != -1" :class="{active:isActive,btn:!isActive}">填写维修报告单
+    </button-com>
+    <div style="text-align: center"><button class="otherBtn" @click="goListother" v-if="this.$route.query.flag==1&&this.$route.query.localhost==1" :class="{ current: isCurrent}">返回故障鉴定列表</button></div>
+    <button-com class="btnLeave" @click.native="goList" v-if="this.$route.query.flag==1&&this.$route.query.localhost==0||this.$route.query.backIdenify==1" :class="{active:isActive,btn:!isActive}">返回故障鉴定列表</button-com>
+    <button-com class="btnLeave" @click.native="goIdenfy" v-if="msg.status==1&&this.$route.query.newApply!=1" :class="{active:isActive,btn:!isActive}">故障鉴定</button-com>
+    <button-com class="btnLeave" @click.native="goHome" v-if="this.$route.query.newApply==1" :class="{active:isActive,btn:!isActive}">返回主页</button-com>
   </div>
 </template>
 <script>
@@ -57,9 +61,25 @@
   import ButtonCom from '../components/Button'
   export default{
     created(){
+//      说明已读消息
+      if(this.$route.query.msgId){
+      api.getReadMsg({
+        method:'get',
+        data:{
+          messageid:this.$route.query.msgId
+        },
+        headers:{
+              	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+          }
+      }).then(response => {
+      })
+      }
       api.getDetail({
         param: {
           id: this.$route.query.id
+        },
+        headers:{
+          'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
         },
         method: 'get'
       }).then(response => {
@@ -69,6 +89,9 @@
         param: {
           id: this.$route.query.id
         },
+        headers:{
+              	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+            },
         method: 'get'
       }).then(response => {
         this.process = response
@@ -77,34 +100,54 @@
     data(){
       return {
         msg: '',
-        process: ''
+        process: '',
+        userInfo: Vue.ls.get("useInfo"),
+        isActive:false,
+        isCurrent:false
       }
     },
     components: {ButtonCom},
     methods: {
       goHome(){
+        this.isActive=true
         this.$router.push('/tabbar')
       },
       detail(){
+        this.isActive=true
         this.$router.push({path: '/deviceDetail', query: {id: this.$route.query.id}})
       },
       goIdenfy(){
+        this.isActive=true
         this.$router.push({path: '/idenify', query: {id: this.$route.query.id}})
       },
       goList(){
+        this.isActive=true
+        this.isCurrent=true
+        this.$router.push({path: '/deviceList', query: {status: this.$route.query.flag}})
+      },
+      goListother(){
+        this.isCurrent=true
         this.$router.push({path: '/deviceList', query: {status: this.$route.query.flag}})
       },
       goPath(){
+        this.isActive=true
         this.$router.push({path: '/pathDetail', query: {id: this.$route.query.id}})
       },
       goRepair(){
+        this.isActive=true
         this.$router.push({path: '/repairReport', query: {id: this.$route.query.id}})
       },
       goAccept(){
+        this.isActive=true
         this.$router.push({path: '/accept', query: {id: this.$route.query.id,status:this.msg.status}})
       },
       goHome(){
+        this.isActive=true
         this.$router.push('/home')
+      },
+      goRepairother(){
+        this.isActive=true
+        this.$router.push({path: '/repairReport', query: {id: this.$route.query.id,other:1}})
       }
     }
   }
@@ -134,6 +177,7 @@
 
   .msgList li.firstLi {
     height: pxToRem(140px);
+    font-size: pxToRem(28px);
   }
 
   .msgList li.firstLi div:last-child {
@@ -236,5 +280,22 @@
 
   .cardList .noUrgent {
     background: #63bd90;
+  }
+  .otherBtn{
+    font-size: pxToRem(32px);
+    color: #f7931e;
+    border: 1px solid #f7931e;
+    background: #eff3f6;
+    width: pxToRem(560px);
+    margin-bottom: pxToRem(30px);
+    height:40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 3px;
+    margin: 0 auto;
+  }
+  .current{
+    color:#faae5c;
+    border: 1px solid #faae5c;
   }
 </style>

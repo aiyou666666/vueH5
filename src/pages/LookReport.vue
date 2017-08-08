@@ -46,8 +46,8 @@
 
     <div class="background"></div>
     <div class="msgDecribe">
-      <div>备注</div>
-      <div>{{msgList.repairComent}}</div>
+      <span>备注</span>
+      <span>{{msgList.repairComent}}</span>
     </div>
   </div>
 </template>
@@ -68,6 +68,9 @@
         param: {
           id:this.$route.query.id
         },
+        headers:{
+          'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+        },
         method:'get'
       }).then(response => {
         this.msgNum=response
@@ -77,12 +80,18 @@
           param: {
             id: this.$route.query.id
           },
+          headers:{
+            'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+          },
           method: 'get'
         }).then(response => {
           this.msgList = response
           api.keyDictionary({
             param: {
               key: this.msgList.repairResultKey
+            },
+            headers:{
+              'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
             },
             method: 'get'
           }).then(response => {
@@ -160,19 +169,18 @@
     height: pxToRem(250px);
     background: #fff;
     padding:pxToRem(30px) ;
-  div{
+  span{
     display: inline-block;
     float: left;
   }
   }
-  .msgDecribe>div:first-child{
+  .msgDecribe>span:first-child{
     font-size: pxToRem(28px);
     margin-right:  pxToRem(25px);
     width: pxToRem(165px);
   }
-  .msgDecribe>div:last-child{
-    float: right;
-    margin-left:pxToRem(190px) ;
-    margin-top:pxToRem(-30px) ;
+  .msgDecribe>span:last-child{
+    min-height: pxToRem(190px);
+    width: pxToRem(190px) ;
   }
 </style>

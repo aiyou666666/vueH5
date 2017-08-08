@@ -24,13 +24,13 @@ module.exports = {
 	dev: {
 		env: require('./dev.env'),
 		port: 8080,
-		autoOpenBrowser: false, //不自动打开浏览器
+		autoOpenBrowser: false, //不自动打开浏览器                 
 		assetsSubDirectory: 'static',
 		assetsPublicPath: '/',
 		/*代理服务器*/
 		proxyTable: {
 			'/api/getsignature':{
-				target:'http://5377ce37.ngrok.io/',
+				target:'http://wechat.aek56.com',
 				changeOrigin: true,
 				pathRewrite: {
 					'^/api': '/'

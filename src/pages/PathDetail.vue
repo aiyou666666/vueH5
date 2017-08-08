@@ -56,12 +56,18 @@
         param: {
           id:this.$route.query.id
         },
+        headers:{
+          'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+        },
         method:'get'
       }).then(response => {
         this.process=response
         api.getDetail({
           param: {
             id:this.$route.query.id
+          },
+          headers:{
+            'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
           },
           method:'get'
         }).then(response => {

@@ -5,7 +5,7 @@
     </mt-popup>
     <mt-actionsheet
       :actions="actions"
-      v-model="sheetVisible" class="sheet">
+      v-model="sheetVisible" class="sheet" :class="{clickSheet:isColor}">
     </mt-actionsheet>
     <div class="background"></div>
     <div class="msgList">
@@ -26,10 +26,10 @@
     <div class="background"></div>
     <div class="decribe uploadImg">
       <span>备注</span>
-      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="identifyComent" :disabled="numOver" @change="change()"></textarea>
+      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="identifyComent" ></textarea>
       <span class="number"><i>{{identifyComent.length}}</i>/300</span>
     </div>
-    <button-com class="btnLeave" @click.native="applyDone">提交</button-com>
+    <button-com class="btnLeave" @click.native="applyDone" :class="{active:isActive,btn:!isActive}">提交</button-com>
   </div>
 </template>
 <script>
@@ -47,12 +47,13 @@
         popupVisible2:false,
         identifyComent:'',
         sceneFlag:'',
-        numOver:false
+        isActive:false
       }
     },
     components:{ButtonCom},
     methods:{
       applyDone(){
+        this.isActive=true
         if(this.localTxt=='是'){
           this.sceneFlag=1
         }
@@ -65,8 +66,14 @@
             position: 'center',
             duration: 1500
           })
+          setTimeout(()=>{
+            this.isActive=false
+          },1000)
         }else{
           api.idenify({
+            headers:{
+              'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
+            },
             method:'post',
             data:{
               "applyId": this.$route.query.id,
@@ -75,15 +82,17 @@
               "sceneFlag":  this.sceneFlag
             }
           }).then(response => {
-              this.$router.push({ path: '/applyDone', query: { flag: 1 ,id:this.$route.query.id}})
+            if( this.sceneFlag==1){
+//              现场解决
+              this.$router.push({ path: '/applyDone', query: { flag: 1 ,id:this.$route.query.id,localhost:0}})
+            }else{
+              this.$router.push({ path: '/applyDone', query: { flag: 1 ,id:this.$route.query.id,localhost:1}})
+            }
           })
         }
       },
       sheet(){
         this.sheetVisible =true
-      },
-      change(){
-        this.numOver=false
       }
     },
     mounted(){
@@ -101,7 +110,7 @@
     watch:{
       identifyComent: function (val) {
       if(val.length>=300){
-        this.numOver=true
+        this.identifyComent=val.substr(0,300)
       }
   }
     }
@@ -168,6 +177,6 @@
     margin-right:  pxToRem(30px);
     margin-top: pxToRem(-30px) ;
     float: right;
-    color: #666;
+    color: #bebebe;
   }
 </style>

@@ -43,4 +43,31 @@ img{
   margin-right:pxToRem(25px);
 }
 }
+.clickSheet{
+  color: #f7931e !important;
+}
+.mint-datetime-confirm{
+  color: #f7931e;
+}
+.mint-datetime-cancel{
+  color:#999;
+}
+.picker-item{
+  color: #bebebe;
+}
+.picker-item.picker-selected{
+  color:#666;
+}
+.mint-swipe-indicators{
+  bottom:  pxToRem(200px);
+}
+.mint-swipe-indicator.is-active{
+  background: #fff;
+}
+.mint-swipe-indicator{
+  border: 1px solid #fff;
+}
+.mint-swipe-indicator{
+   opacity: 1;
+  }
 </style>

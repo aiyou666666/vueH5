@@ -22,6 +22,8 @@
 <script>
   export default{
     props:['msg'],
+    created(){
+    },
     methods:{
       detail(id){
         this.$router.push({ path: '/applyDone', query: { id: id}})
@@ -57,8 +59,8 @@
   };
   }
   .msgCard>img{
-    width: pxToRem(151px) ;
-    height: pxToRem(151px) ;
+    width: pxToRem(150px) ;
+    height: pxToRem(150px) ;
     float: left;
     margin-right: pxToRem(32px);
   }
