@@ -1,5 +1,11 @@
 <template>
   <div>
+    <div v-show="loading">
+      <div class="loading">
+        <img src="../assets/images/loading.gif" alt="">
+      </div>
+    </div>
+  <div v-show="limits">
     <div class="background"></div>
     <div class="msgList">
       <ul>
@@ -18,28 +24,17 @@
         <li>
           <span>维修后状态</span><span>{{repairResultKey}}</span>
         </li>
-      </ul>
-    </div>
-    <div class="background"></div>
-    <div class="msgList">
-      <ul>
         <li >
-          <span>设备编号</span><span>{{msgNum.assetsNum}}</span>
+          <span>开始时间</span><span>{{msgList.repairPeriodStart | timeChange}}</span>
         </li>
         <li>
-          <span>设备名称</span><span>{{msgNum.assetsName}}</span>
+          <span>结束时间</span><span>{{msgList.repairPeriodEnd | timeChange}}</span>
         </li>
         <li >
-          <span>开始时间</span><span>{{msgList.repairPeriodStart}}</span>
+          <span>维修费</span><span>{{msgList.repairCost/100 | toFixed}}元</span>
         </li>
         <li>
-          <span>结束时间</span><span>{{msgList.repairPeriodEnd}}</span>
-        </li>
-        <li >
-          <span>维修费</span><span>{{msgList.repairCost/100 | toFixed}}</span>
-        </li>
-        <li>
-          <span>材料费</span><span>{{msgList.partsCost/100 | toFixed}}</span>
+          <span>材料费</span><span>{{msgList.partsCost/100 | toFixed}}元</span>
         </li>
       </ul>
     </div>
@@ -50,6 +45,14 @@
       <span>{{msgList.repairComent}}</span>
     </div>
   </div>
+  <div v-show="nolimits">
+    <div class="noresult">
+
+      <img src="../assets/images/noresult.png" alt="">
+      <div>没有权限</div>
+    </div>
+  </div>
+  </div>
 </template>
 <script>
   import Vue from 'vue'
@@ -57,17 +60,23 @@
   export default{
     data(){
       return {
+        loading:true,
+        limits:false,
+        nolimits:false,
         msgList: '',
         repairResultKey:'',
-        msgNum:''
+        msgNum:'',
+        userInfo: Vue.ls.get("useInfo")
       }
     },
     created(){
+      document.title='查看维修报告单'
 //      获取单号
       api.getDetail({
         param: {
           id:this.$route.query.id
         },
+        _this:this,
         headers:{
           'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
         },
@@ -76,20 +85,39 @@
         this.msgNum=response
       })
 //      查看维修报告
+      let _this=this
         api.lookReport({
+            callBack:function(res){
+              if(res.code==403){
+                setTimeout(()=>{
+                  _this.loading=false
+                  _this.limits=false
+                  _this.nolimits=true
+                })
+              }
+            },
           param: {
             id: this.$route.query.id
           },
+          _this:this,
           headers:{
             'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
           },
           method: 'get'
         }).then(response => {
+          setTimeout(()=>{
+          this.loading=false
+        if(this.userInfo.authoritiesStr.indexOf('REP_APPLY_REPORT_VIEW') != -1){
+          this.limits=true
+          this.nolimits=false
+        }
+      },1000)
           this.msgList = response
           api.keyDictionary({
             param: {
               key: this.msgList.repairResultKey
             },
+            _this:this,
             headers:{
               'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
             },
@@ -166,12 +194,14 @@
   }
   }
   .msgDecribe{
-    height: pxToRem(250px);
+    min-height: pxToRem(250px);
     background: #fff;
     padding:pxToRem(30px) ;
+    overflow: hidden;
   span{
     display: inline-block;
     float: left;
+
   }
   }
   .msgDecribe>span:first-child{
@@ -181,6 +211,7 @@
   }
   .msgDecribe>span:last-child{
     min-height: pxToRem(190px);
-    width: pxToRem(190px) ;
+    word-break:break-all;
+    width:pxToRem(500px);
   }
 </style>

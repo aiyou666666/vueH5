@@ -103,7 +103,8 @@
 				 	"account":this.userTelemail,
 				 	"code":this.phonemessage,
 				 	"password":this.userpassword
-				 }
+				 },
+				 _this:this
 			}).then(response=>{
 				Toast({
 						message:"修改成功",

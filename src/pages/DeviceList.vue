@@ -1,51 +1,55 @@
 <template>
   <div class="name">
-    <div class="modal" v-show="timeModal" @click="timeModal=false">
-      <ul>
-        <li @click="timeClick">
-          <span :class="{current:applytime}">申请时间</span>
-          <span><img src="../assets/images/gx.png" alt="" v-show="applytime"></span>
-        </li>
-        <li @click="hurreyClick">
-          <span :class="{current:hurrey}">紧急程度</span>
-          <span><img src="../assets/images/gx.png" alt="" v-show="hurrey"></span>
-        </li>
-      </ul>
+    <div v-show="loadingimg">
+      <div class="loading">
+        <img src="../assets/images/loading.gif" alt="">      </div>
     </div>
-    <div class="modal" v-show="morenModal"  @click="morenModal=false">
-      <ul>
-        <li @click="morenClick(index,l)" v-for="(l , index) in morenList">
-          <span :class="{current:index==morenIndex}">{{l}}</span>
-          <span><img src="../assets/images/gx.png" alt="" v-show="index==morenIndex"></span>
-        </li>
-      </ul>
-    </div>
-    <div class="modal" v-show="statusModal"  @click="statusModal=false">
-      <ul>
-        <li @click="statusClick(index,l)" v-for="(l , index) in statusList">
-          <span :class="{current:index==statusIndex}">{{l}}</span>
-          <span><img src="../assets/images/gx.png" alt="" v-show="index==statusIndex"></span>
-        </li>
-      </ul>
-    </div>
-    <div class="fixed">
-      <ul>
-        <li :class="{moren:!accept,accept:accept}" @click="timeModal=true,morenModal=false,statusModal=false">{{txtModal}}
-          <img src="../assets/images/xjt.png" alt="" v-if="!timeModal">
-          <img src="../assets/images/change.png" alt="" v-if="timeModal">
-        </li>
-        <li v-if="accept" :class="{moren:!accept,accept:accept}" class="allStatus" @click="timeModal=false,morenModal=false,statusModal=true">{{ statustxtMOdal}}
-          <img src="../assets/images/xjt.png" alt=""  v-if="!statusModal">
-          <img src="../assets/images/change.png" alt="" v-if="statusModal">
-        </li>
-        <li :class="{moren:!accept,accept:accept}" @click="morenModal=true,timeModal=false,statusModal=false">{{morentxtModal}}
-          <img src="../assets/images/xjt.png" alt="" v-if="!morenModal">
-          <img src="../assets/images/change.png" alt="" v-if="morenModal">
-        </li>
-      </ul>
-    </div>
-    <div class="background"></div>
-    <div v-if="list.length!=0">
+    <div v-if="has" class="data-wrap">
+      <div class="modal" v-show="timeModal" @click="timeModal=false">
+        <ul>
+          <li @click="timeClick">
+            <span :class="{current:applytime}">申请时间</span>
+            <span><img src="../assets/images/gx.png" alt="" v-show="applytime"></span>
+          </li>
+          <li @click="hurreyClick">
+            <span :class="{current:hurrey}">紧急程度</span>
+            <span><img src="../assets/images/gx.png" alt="" v-show="hurrey"></span>
+          </li>
+        </ul>
+      </div>
+      <div class="modal" v-show="morenModal"  @click="morenModal=false">
+        <ul>
+          <li @click="morenClick(index,l)" v-for="(l , index) in morenList">
+            <span :class="{current:index==morenIndex}">{{l}}</span>
+            <span><img src="../assets/images/gx.png" alt="" v-show="index==morenIndex"></span>
+          </li>
+        </ul>
+      </div>
+      <div class="modal" v-show="statusModal"  @click="statusModal=false">
+        <ul>
+          <li @click="statusClick(index,l)" v-for="(l , index) in statusList">
+            <span :class="{current:index==statusIndex}">{{l}}</span>
+            <span><img src="../assets/images/gx.png" alt="" v-show="index==statusIndex"></span>
+          </li>
+        </ul>
+      </div>
+      <div class="fixed">
+        <ul>
+          <li :class="{moren:!accept,accept:accept}" @click="timeModal=true,morenModal=false,statusModal=false">{{txtModal}}
+            <img src="../assets/images/xjt.png" alt="" v-if="!timeModal">
+            <img src="../assets/images/change.png" alt="" v-if="timeModal">
+          </li>
+          <li v-if="accept" :class="{moren:!accept,accept:accept}" class="allStatus" @click="timeModal=false,morenModal=false,statusModal=true">{{ statustxtMOdal}}
+            <img src="../assets/images/xjt.png" alt=""  v-if="!statusModal">
+            <img src="../assets/images/change.png" alt="" v-if="statusModal">
+          </li>
+          <li :class="{moren:!accept,accept:accept}" @click="morenModal=true,timeModal=false,statusModal=false">{{morentxtModal}}
+            <img src="../assets/images/xjt.png" alt="" v-if="!morenModal">
+            <img src="../assets/images/change.png" alt="" v-if="morenModal">
+          </li>
+        </ul>
+      </div>
+      <div class="background"></div>
       <ul
         v-infinite-scroll="loadMore"
         infinite-scroll-disabled="loading"
@@ -55,7 +59,7 @@
         <div v-show="loading&&!nodata" class="loadMore"><img src="../assets/images/jz.png" alt=""></div>
       </ul>
     </div>
-    <div v-else class="nodata">
+    <div v-if="nohas" class="nodata" style="height: 100%">
       <img src="../assets/images/nodata.png" alt="">
       <div>暂无数据</div>
     </div>
@@ -65,7 +69,6 @@
   import Vue from 'vue'
   import api from '../service/api.js'
   import DeviceCard from '../components/DeviceCard'
- 
   export default{
     data(){
       return{
@@ -91,7 +94,10 @@
           allLoaded:false,
           nodata:false,
           userInfo: Vue.ls.get("useInfo"),
-          status:''
+          status:'',
+          loadingimg:true,
+          has:false,
+          nohas:false
       }
     },
     components:{DeviceCard},
@@ -111,6 +117,7 @@
                 'pageNo':this.pageNo,
                 'tenantId':this.userInfo.tenantId
               },
+              _this:this,
               headers:{
               	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
               },
@@ -135,6 +142,7 @@
               'pageNo': this.pageNo,
               'tenantId':this.userInfo.tenantId
             },
+            _this:this,
             headers:{
               	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
              },
@@ -149,7 +157,7 @@
             }
           })
         }
-        }, 2500);
+        },500);
       },
       timeClick(){
           this.pageNo=1
@@ -236,12 +244,21 @@
             'pageNo':pageNo,
             'tenantId':this.userInfo.tenantId
           },
+          _this:this,
           headers:{
             'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
           },
           method:'get'
         }).then(response => {
           this.list=response.records
+          setTimeout(()=>{
+            this.loadingimg=false
+            if(this.list.length==0){
+              this.nohas=true
+            }else{
+              this.has=true
+            }
+          },1000)
         })
       },
       ajaxAccept(orderByField,urgentLevel,status,pageNo){
@@ -255,16 +272,34 @@
             'pageNo':pageNo,
             'tenantId':this.userInfo.tenantId
           },
+          _this:this,
           headers:{
             'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
           },
           method:'get'
         }).then(response => {
           this.list =response.records
+          setTimeout(()=>{
+            this.loadingimg=false
+            if(this.list.length==0){
+              this.nohas=true
+            }else{
+              this.has=true
+            }
+          },1000)
         })
       }
     },
     created(){
+      if(this.$route.query.status==10){
+        document.title='维修验收'
+      }
+      if(this.$route.query.status==3){
+        document.title='设备维修'
+      }
+      if(this.$route.query.status==1){
+        document.title='故障鉴定'
+      }
       if(this.$route.query.status==10){
         this.accept=true
         this.ajaxAccept(this.orderByField,'',this.status,'')
@@ -279,6 +314,7 @@
   @import "../assets/scss/my-mixin.scss";
   .name{
     height: 100%;
+    overflow: hidden;
   }
   .modal{
     height: 100%;
@@ -326,7 +362,7 @@
       img{
         width: pxToRem(30px);
         height: pxToRem(15px);
-        margin-left:pxToRem(30px) ;
+        margin-left:pxToRem(20px) ;
       };
     };
   };
@@ -341,6 +377,12 @@
   }
   .fixed ul li:first-child{
     border-right: 1px solid #e5e5e5;
+  }
+  .data-wrap{
+  	height:100%;
+  	overflow-x: scroll;
+  	padding-bottom:pxToRem(80px);
+  	-webkit-overflow-scrolling:touch
   }
   .background{
     height: pxToRem(80px);

@@ -4,7 +4,7 @@
     <div class="useMsg" @click="UseMsg()">
       <img src="../assets/images/homeset.png" alt="" >
       <div class="useName">{{userInfo.realName | homeName}}<i v-show="currentUser.jobName">（{{currentUser.jobName |　homeDept}}）</i></div>
-      <div>{{userInfo.deptName}}</div>
+      <div class="deptName">{{userInfo.deptName}}</div>
       <div>{{userInfo.tenantName}}</div>
     </div>
     <div class="listMsg">
@@ -62,19 +62,20 @@
       NewApply(){
       let _this=this;
     //微信扫码
+
       wxInit.created(function(res){
 					wx.scanQRCode({
 						desc: '扫一扫',
 						needResult: 1,
 						success:function(res){
 							_this.$router.push({path:'/newApply',query:{id:res.resultStr}})
-							
+
 						}
 					})
        })
 
       	// wx.chooseWXPay();
-         //this.$router.push('/newApply')
+//         this.$router.push('/newApply')
 //        this.$router.push('/newApply')
 
       },
@@ -86,13 +87,16 @@
       }
     },
     created(){
+      Vue.ls.set("newApply","isNewApply");
+      document.title="首页"
       Vue.ls.set("files",[])
       Vue.ls.set("faultDesc",'')
       Vue.ls.set("urgentLevel",'')
       api.getPermissionList({
       	headers:{
               	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")||''
-          }
+         },
+         _this:this
       }).then(response => {
         Vue.ls.set("useInfo",response)
         this.userInfo=response
@@ -102,6 +106,7 @@
           headers:{
             'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
           },
+          _this:this,
           param:{
             id:this.userInfo.id
           }
@@ -114,6 +119,7 @@
         headers:{
               	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
          },
+         _this:this,
         param:{
          id:this.userInfo.tenantId
         }
@@ -157,6 +163,14 @@
     background-size: 100% pxToRem(320px) ;
     padding:pxToRem(30px) ;
   }
+  .deptName{
+  	max-width: pxToRem(500px);
+  	text-overflow: ellipsis;
+  	overflow: hidden;
+  	white-space: nowrap;
+  	display: inline-block;
+
+  }
   .useName {
     font-size:pxToRem(32px);
     padding-top:pxToRem(50px);
@@ -189,6 +203,9 @@
   .cellList{
     margin-top:pxToRem(20px) ;
     border-top: 1px solid #e5e5e5;
+    ul{
+    	overflow: hidden;
+    }
     ul>li{
       background: #fff;
       box-sizing:border-box;
@@ -196,6 +213,8 @@
   }
   .moreLi{
     @include cellLi(50%);
+    border-bottom: 1px solid #e5e5e5;
+    margin-top:pxToRem(1px) ;
   }
   .cellList li.moreLi:nth-child(2n+1){
     border-right: 1px solid #e5e5e5 !important;

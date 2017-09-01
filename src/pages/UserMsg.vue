@@ -7,7 +7,7 @@
           <div>{{userInfo.realName}}</div>
           <div><span style="float: left">{{userInfo.deptName}}</span><span style="float: right">{{currentUser.jobName}}</span></div>
         </li>
-        <li>
+        <li class="secondLi">
           <span>所属机构</span><span>{{userInfo.tenantName}}</span>
         </li>
       </ul>
@@ -41,11 +41,19 @@
           currentUser:Vue.ls.get("currentuseInfo")
         }
       },
+      created(){
+        document.title='我的'
+        //解决登录返回的问题
+       if(!Vue.ls.get("useInfo")){
+         	this.$router.push('/')
+       }
+      },
       components:{ButtonCom},
       methods:{
         loginout(){
                this.isActive=false
                api.loginOut({
+               	_this:this,
                headers:{
               	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
                }
@@ -78,25 +86,38 @@
   .msgList li span:first-child{
     float: left;
     color: #333;
+    max-width:pxToRem(300px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
   .msgList li span:last-child{
     float: right;
     margin-right: pxToRem(30px);
     color: #666;
+    max-width:pxToRem(350px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
   .msgList li.firstLi{
     height: pxToRem(140px) ;
+
   }
   .msgList li.firstLi div:last-child{
     height: pxToRem(60px);
     color:#666;
-    line-height: pxToRem(30px);
+    line-height: pxToRem(50px);
   }
   .msgList li.firstLi div:first-child{
     height: pxToRem(80px);
     font-size:pxToRem(32px);
     line-height: pxToRem(90px);
     color: #333;
+     max-width:pxToRem(500px) ;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
   .btnLeave{
     margin-top: pxToRem(55px) !important;

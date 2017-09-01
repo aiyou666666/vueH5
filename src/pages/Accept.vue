@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%">
     <mt-popup v-model="popupVisible2" position="top" class="mint-popup-2" :modal="false">
       <p ><img src="../assets/images/fail.png" alt=""><span>提交失败，请检查网络重试</span></p>
     </mt-popup>
@@ -13,13 +13,14 @@
     </mt-actionsheet>
     <div class="background"></div>
     <div class="msgList" v-if="$route.query.status==4">
-      <ul>
+      <!--REP_APPLY_REPORT_VIEW-->
+      <ul   v-if="userInfo.authoritiesStr.indexOf('REP_APPLY_REPORT_VIEW') != -1">
         <li @click="lookReport" >
           <span>维修报告单</span><img src="../assets/images/jr.png" alt="" class="choose" >
         </li>
       </ul>
     </div>
-    <div class="background"></div>
+    <div class="background" v-if="userInfo.authoritiesStr.indexOf('REP_APPLY_REPORT_VIEW') != -1"></div>
     <div class="msgList">
       <ul>
         <li @click="sheet">
@@ -42,7 +43,7 @@
     <div class="background"></div>
     <div class="decribe uploadImg">
       <span>备注</span>
-      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="assessComent" ></textarea>
+      <textarea placeholder="请输入备注，300字以内，非必填" v-model="assessComent" @keyup="key" @paste="key"></textarea>
       <span class="number"><i>{{assessComent.length}}</i>/300</span>
     </div>
     <button-com class="btnLeave" @click.native="applyDone" :class="{active:isActive,btn:!isActive}">提交</button-com>
@@ -54,6 +55,9 @@
   import api from '../service/api.js'
   import ButtonCom from '../components/Button'
   export default{
+    created(){
+      document.title='验收'
+    },
     data(){
       return{
         list:[
@@ -78,11 +82,18 @@
         repairQuality:'',
         responseSpeed:'',
         checkStatus:'',
-        isActive:false
+        isActive:false,
+        userInfo: Vue.ls.get("useInfo"),
+        right:true
       }
     },
     components:{ButtonCom},
     methods:{
+      key(){
+        if(this.assessComent.length>=300){
+          this.assessComent=this.assessComent.substr(0,300)
+        }
+      },
       startNum(index1,index2,oneStart,twoStart,threeStart,fourStart,fiveStart){
           if (index2 == 0) {
               this.list[index1].number = [true, false, false, false, false],
@@ -103,6 +114,7 @@
         }
       },
       applyDone(){
+        this.right=true
 //        this.popupVisible2 = true
 //        this.$router.push('/applyDone')
         this.isActive=true
@@ -115,27 +127,40 @@
           setTimeout(()=>{
             this.isActive=false
           },1000)
-        } else if(this.statusTxt=='请选择设备维修后状态'){
+        } else if(this.statusTxt=='请选择设备维修后状态') {
           Toast({
             message: '请选择设备维修后状态',
+            position: 'center',
+            duration: 1500
+          })
+          setTimeout(()=> {
+            this.isActive = false
+          }, 1000)
+        }
+      if((this.resultTxt=='验收通过'&&(this.statusTxt==4||this.statusTxt==5||this.statusTxt==6))||(this.resultTxt=='验收未通过'&&(this.statusTxt==1||this.statusTxt==2||this.statusTxt==3))){
+          Toast({
+            message: '验收结果和设备现况不符',
             position: 'center',
             duration: 1500
           })
           setTimeout(()=>{
             this.isActive=false
           },1000)
+          this.right=false
         }
-        if(this.resultTxt!='请选择验收结果'&&this.statusTxt!='请选择设备维修后状态') {
+        if(this.resultTxt!='请选择验收结果'&&this.statusTxt!='请选择设备维修后状态'&&this.right) {
+          console.log(this.resultTxt)
           if(this.resultTxt=='验收通过'){
             this.checkStatus=1;
           }
-          if(this.resultTxt=='验收不通过'){
+          if(this.resultTxt=='验收未通过'){
             this.checkStatus=2;
           }
           api.writeAccept({
             headers:{
               'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
             },
+            _this:this,
             method:'post',
             data:{
             "applyId": this.$route.query.id,
@@ -159,11 +184,11 @@
           this.repairAttitude=index2+1
           this.startNum(index1,index2,'很差 2.0分','差 4.0分','一般 6.0分','满意 8.0分','非常满意 10.0分')
         }
-        if(index1==1){
+        if(index1==2){
           this.repairQuality=index2+1
           this.startNum(index1,index2,'很慢 2.0分','慢 4.0分','一般 6.0分','快 8.0分','非常快 10.0分')
         }
-        if(index1==2){
+        if(index1==1){
           this.responseSpeed=index2+1
           this.startNum(index1,index2,'很差 2.0分','差 4.0分','一般 6.0分','好 8.0分','非常好 10.0分')
         }
@@ -184,6 +209,7 @@
       }
     },
     mounted(){
+      console.log(this.userInfo.authoritiesStr.indexOf('REP_APPLY_REPORT_VIEW') != -1)
       this.actions=[
         {name:'验收通过',method:()=>{
             this.isResult=true,
@@ -203,16 +229,16 @@
       }}
     ]
         }},
-        {name:'验收不通过',method:()=>{
+        {name:'验收未通过',method:()=>{
             this.isResult=true,
-            this.resultTxt='验收不通过'
+            this.resultTxt='验收未通过'
             this.actions2=[
-            {name:'需进一步修理',method:()=>{
+            {name:'需进一步维修',method:()=>{
               this.isStatus=true,
               this.statusTxt=4
         }},
-            {name:'需外送修理',method:()=>{
-              this.isStatust=true,
+            {name:'需外送维修',method:()=>{
+              this.isStatus=true,
               this.statusTxt=5
           }},
             {name:'其他',method:()=>{

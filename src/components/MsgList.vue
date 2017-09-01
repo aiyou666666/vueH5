@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-cloak>
     <div class="MsgList" :class="{weidu:message.messageStatus==1}">
       <ul>
         <li class="MsgFirst" :class="{weidu:message.messageStatus==1}"><span>{{message.messageContent}}</span><span :class="{noUrgent:message.messageLevel==1||message.messageLevel==2,Urgent:message.messageLevel==3,veryUrgent:message.messageLevel==4,yidu:message.messageStatus==1}">{{message.messageLevel |　urgentLevel}}</span></li>

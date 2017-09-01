@@ -1,6 +1,6 @@
 @mixin color($color,$background){
   color:$color;
-  background: $background;
+  background-color: $background;
 }
 @mixin height($height,$lineheight){
   height:$height;
@@ -68,6 +68,7 @@
     width:pxToRem(130px);
     height:pxToRem(20px);
   }
+  margin-top:pxToRem(10px) ;
 }
 .nodata{
   height: 94%;
@@ -87,15 +88,16 @@
   @include color(#fff,#faae5c);
   font-size: pxToRem(32px);
   @include height(40px,40px);
-  width: pxToRem(560px);
+  width: pxToRem(680px);
   margin-bottom: pxToRem(30px);
 }
 .btn {
   font-size: pxToRem(32px);
   @include color(#fff,#f7931e);
   @include height(40px,40px);
-  width: pxToRem(560px);
+  width: pxToRem(680px);
   margin-bottom: pxToRem(30px);
+  background-color:none!important ;
 }
 .noresult{
     padding-top:40%;
@@ -111,4 +113,9 @@
       margin-bottom: pxToRem(400px);
     }
   }
+.loading{
+  text-align: center;
+  padding-top: 50%;
+  margin-top: -pxToRem(80px);
+}
 

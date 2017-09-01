@@ -16,6 +16,10 @@ export default {
 #app{
   height: 100%;
 }
+[v-cloak] {
+  display: none;
+}
+
 .mint-actionsheet-listitem, .mint-actionsheet-button{
   font-size: pxToRem(28px);
 }

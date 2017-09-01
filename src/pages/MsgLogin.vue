@@ -67,6 +67,7 @@
     			"mobile":this.userphone,
     			"deviceId":this.deviceId
     		 }),
+    		 _this:this,
     		 headers:{'Content-Type':'application/x-www-form-urlencoded'}
     		}).then(response=>{
     			  /*倒计时*/
@@ -78,6 +79,7 @@
         this.isActive=true
         if(!this.validation())return
     		api.Login({
+    			_this:this,
     			data:{
     				"username": this.userphone,
 						"password": this.phonemsg,
@@ -86,6 +88,7 @@
     		}).then(response=>{
     			Vue.ls.set("X-AEK56-Token",response.token,response.expire)
           api.msgNum({
+          	_this:this,
             method:'get'
           }).then(response=>{
             Vue.ls.set("msgNum",response);

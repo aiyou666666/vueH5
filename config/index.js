@@ -23,8 +23,8 @@ module.exports = {
 	},
 	dev: {
 		env: require('./dev.env'),
-		port: 8080,
-		autoOpenBrowser: false, //不自动打开浏览器                 
+		port:8080,
+		autoOpenBrowser: false, //不自动打开浏览器
 		assetsSubDirectory: 'static',
 		assetsPublicPath: '/',
 		/*代理服务器*/

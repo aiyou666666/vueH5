@@ -4,7 +4,7 @@
     <div class="msgList">
       <ul>
         <li>
-          设备状态: {{msg.status | statusChange}}
+          设备状态: {{msg.status | status}}
         </li>
       </ul>
     </div>
@@ -13,23 +13,23 @@
       <ul>
         <li class="firstLi" :class="{pathed:isPathed}" v-if="six">
           <div ><img src="../assets/images/cw.png" alt="">验收未通过</div>
-          <div ><span>{{process.repairCheckName}}</span><span>{{process.repairCheckDate | timeChange}}</span></div>
+          <div ><span class="repairCheckName">{{process.repairCheckName}}</span><span>{{process.repairCheckDate | timeChange}}</span></div>
         </li>
         <li class="firstLi" v-if="five">
           <div ><img src="../assets/images/cg.png" alt="">验收通过</div>
-          <div ><span>{{process.repairCheckName}}</span><span>{{process.repairCheckDate | timeChange}}</span></div>
+          <div ><span class="repairCheckName">{{process.repairCheckName}}</span><span>{{process.repairCheckDate | timeChange}}</span></div>
         </li>
         <li class="firstLi" :class="{pathed:isPathed}" v-if="four">
           <div ><img src="../assets/images/cg.png" alt="">提交维修报告</div>
-          <div ><span>{{process.repairName}}</span><span>{{process.repairDate | timeChange}}</span></div>
+          <div ><span class="repairCheckName">{{process.repairName}}</span><span>{{process.repairDate | timeChange}}</span></div>
         </li>
-        <li class="firstLi" v-if="three">
+        <li class="firstLi" :class="{pathed:isPathed}" v-if="three">
           <div><img src="../assets/images/cg.png" alt="">提交故障鉴定</div>
-          <div><span>{{process.identifyName}}</span><span>{{process.identifyDate | timeChange}}</span></div>
+          <div><span class="repairCheckName">{{process.identifyName}}</span><span>{{process.identifyDate | timeChange}}</span></div>
         </li>
         <li class="firstLi" :class="{pathed:isPathed}" v-if="two">
           <div ><img src="../assets/images/cg.png" alt="">提交申请</div>
-          <div ><span>{{process.reportRepairName}}</span><span>{{process.reportRepairDate | timeChange}}</span></div>
+          <div ><span class="repairCheckName">{{process.reportRepairName}}</span><span>{{process.reportRepairDate | timeChange}}</span></div>
         </li>
       </ul>
     </div>
@@ -52,10 +52,12 @@
       }
     },
     created(){
+      document.title='故障流程'
       api.getProcess({
         param: {
           id:this.$route.query.id
         },
+        _this:this,
         headers:{
           'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
         },
@@ -66,6 +68,7 @@
           param: {
             id:this.$route.query.id
           },
+          _this:this,
           headers:{
             'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
           },
@@ -151,7 +154,7 @@
   .msgList li.firstLi div:last-child{
     height: pxToRem(60px);
     color:#666;
-    line-height: pxToRem(30px);
+    line-height: pxToRem(50px);
   }
   .msgList li.firstLi div:first-child{
     height: pxToRem(80px);
@@ -165,10 +168,18 @@
     margin-right:  pxToRem(25px);
     margin-top:pxToRem(-5px) ;
   }
+  .firstLi .repairCheckName{
+  	max-width:pxToRem(400px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
   .msgList li span{
     display: inline-block;
     margin-right:  pxToRem(25px);
     color: #666;
+    vertical-align: middle;
   }
   .msgList li>span:first-child{
     width: pxToRem(165px);
@@ -176,6 +187,22 @@
   }
   .msgList .pathed{
     color: #999;
+    div{
+    	color:#999 !important ;
+    	span{
+    		color:#999;
+    	}
+    }
   }
+  .msgList .pathed:first-child{
+  	color: #333;
+  	div{
+    	color:#333 !important ;
+    	span{
+    		color:#333;
+    	}
+    }
+  }
+
 </style>
 

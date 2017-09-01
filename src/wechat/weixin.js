@@ -3,6 +3,7 @@ import axios from 'axios'
 import api from '../service/api.js'
 export default {
 	created(fn) {
+		let _this=this;
 		api.getWeiChatToken({
 			data: {
 				url: location.href.split('#')[0] // 将当前URL地址上传至服务器用于产生数字签名			    
@@ -57,6 +58,7 @@ export default {
 				fn && fn(res)	
 			})
 			wx.error(function(res) {
+				//_this.created();
 				/*报错就再次调用api获取wx token*/
 				
 

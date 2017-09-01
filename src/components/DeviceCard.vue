@@ -8,7 +8,7 @@
       <img :src="msg.assetsImg | showImage" alt="" v-else>
       <span>
         <ul class="cardList" @click="detail(msg.id)">
-            <li>{{msg.assetsName | machineName}}<span class="duge" :class="{noUrgent:msg.urgentLevel==1||msg.urgentLevel==2,Urgent:msg.urgentLevel==3,veryUrgent:msg.urgentLevel==4}">{{msg.urgentLevel | urgentLevel}}</span></li>
+            <li><span>{{msg.assetsName | machineName}}</span><span class="duge" :class="{noUrgent:msg.urgentLevel==1||msg.urgentLevel==2,Urgent:msg.urgentLevel==3,veryUrgent:msg.urgentLevel==4}">{{msg.urgentLevel | urgentLevel}}</span></li>
             <li>{{msg.assetsDeptName | officeName}}
               <img src="../assets/images/jr.png" alt="" >
             </li>
@@ -88,14 +88,16 @@
   .duge{
     height: pxToRem(40px) ;
     line-height:  pxToRem(40px);
-    float: right;
+    /*float: right;*/
     display: inline-block;
     font-size: pxToRem(20px);
     text-align: center;
     color: #fff;
     border-radius: 15px;
-    width:pxToRem(135px) ;
+    width:pxToRem(120px) ;
     padding-top: pxToRem(2px);
+    margin-left: pxToRem(30px);
+    margin-top: pxToRem(2px);
   }
   .cardList .veryUrgent{
     background: #f3756f;

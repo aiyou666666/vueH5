@@ -32,6 +32,7 @@
     "vue-router": "^2.3.1",
     "vue-scroller": "^2.2.1",
     "vue-ui-swipe": "^1.0.2",
+    "vux": "^2.5.7",
     "wechat-jssdk": "^3.0.9",
     "weixin-js-sdk": "^1.2.0"
   },

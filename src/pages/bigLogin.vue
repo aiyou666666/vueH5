@@ -97,13 +97,19 @@
       components: {
         ButtonCom
       },
+
       created(){
 //        login
+        document.title="登录"
+        document.body.style.background="#fff";
         if (Vue.ls.get("X-AEK56-Token")) {
           this.getmsgNum(()=> {
             this.$router.push({path: '/tabbar', query: {isLogin: true}});
           })
         }
+      },
+      destroyed(){
+      	document.body.style.background="#eff3f6";
       },
       methods: {
 //        login
@@ -111,17 +117,15 @@
           this.login = false
           this.msglogin = false
           this.findlogin = true
-          this.userTelemail=Vue.ls.get("userTelemail")?Vue.ls.get("userTelemail"):''
-          this.userphone=Vue.ls.get("userphone")?Vue.ls.get("userphone"):''
-          this.username=Vue.ls.get("username")?Vue.ls.get("username"):''
+          this.password=''
+          document.title="忘记密码"
         },
         msgLogin(){
           this.login = false
           this.msglogin = true
           this.findlogin = false
-          this.userTelemail=Vue.ls.get("userTelemail")?Vue.ls.get("userTelemail"):''
-          this.userphone=Vue.ls.get("userphone")?Vue.ls.get("userphone"):''
-          this.username=Vue.ls.get("username")?Vue.ls.get("username"):''
+          this.password=''
+          document.title="登录"
         },
         validation(){
           if (!utils.isEmail(this.username) && !utils.isTelphone(this.username)) {
@@ -154,6 +158,7 @@
         getmsgNum(callback){
           api.msgNumfind({
             method: 'get',
+            _this:this,
             headers: {
               'X-AEK56-Token': Vue.ls.get("X-AEK56-Token")
             }
@@ -172,12 +177,14 @@
               "password": this.password,
               "deviceId": this.deviceId
             },
+            noToken:"noNeed",
+            _this:this,
             method: 'post'
 
           }).then(response => {
-          	
+
           	//vue-ls设置有效期时会 自动加一个new Date().getTime()
-            Vue.ls.set("X-AEK56-Token", response.token, response.expire-new Date().getTime());  
+            Vue.ls.set("X-AEK56-Token", response.token, response.expire-new Date().getTime());
             this.getmsgNum(()=> {
               this.$router.push({path: '/tabbar', query: {isLogin: true}});
             })
@@ -190,9 +197,13 @@
           this.login = true
           this.msglogin = false
           this.findlogin = false
-          this.userTelemail=Vue.ls.get("userTelemail")?Vue.ls.get("userTelemail"):''
-          this.userphone=Vue.ls.get("userphone")?Vue.ls.get("userphone"):''
-          this.username=Vue.ls.get("username")?Vue.ls.get("username"):''
+          this.phonemsg=''
+          this.phonemessage=''
+          this.userpassword=''
+          document.title="登录"
+//          this.userTelemail=Vue.ls.get("userTelemail")?Vue.ls.get("userTelemail"):''
+//          this.userphone=Vue.ls.get("userphone")?Vue.ls.get("userphone"):''
+//          this.username=Vue.ls.get("username")?Vue.ls.get("username"):''
         },
         validationm(){
           if (!utils.isTelphone(this.userphone)) {
@@ -227,6 +238,8 @@
               "mobile": this.userphone,
               "deviceId": this.deviceId
             }),
+            noToken:"noNeed",
+            _this:this,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
           }).then(response=> {
             /*倒计时*/
@@ -241,14 +254,18 @@
             data: {
               "username": this.userphone,
               "password": this.phonemsg,
-              "deviceId": this.deviceId
-            }
+              "deviceId": this.deviceId,
+              "loginType":1
+            },
+            noToken:"noNeed",
+            _this:this
           }).then(response=> {
             Vue.ls.set("X-AEK56-Token", response.token, response.expire)
             api.msgNumfind({
               headers: {
                 'X-AEK56-Token': Vue.ls.get("X-AEK56-Token")
               },
+              _this:this,
               method: 'get'
             }).then(response=> {
               Vue.ls.set("msgNum", response);
@@ -259,22 +276,53 @@
         },
         countDownm(){
           this.isCountDownm = true
+          this.countDownTimem = '60s'
           this.timeOutm = setInterval(this.updataTime, 1000)
         },
         updataTime(){
           this.countDownTimem = parseInt(this.countDownTimem)
-          if (this.countDownTimem <= 0) {
-            this.countDownTimem = '60s'
+          if (this.countDownTimem<=1) {
+            this.countDownTimem = '59s'
             this.isCountDownm = false
-            clearInterval(this.Interval)
+            clearInterval(this.timeOutm)
           } else {
             this.countDownTimem--
             this.countDownTimem = this.countDownTimem + 's'
           }
         },
 //       findmsg
+        countDownf(){
+          this.isCountDownf=true
+          this.countDownTimef = '60s'
+          this.timeOutf=setInterval(this.updataTimef,1000)
+        },
+        updataTimef(){
+          this.countDownTimef = parseInt(this.countDownTimef)
+          if (this.countDownTimef <= 1) {
+            this.countDownTimef = '59s'
+            this.isCountDownf = false
+            clearInterval( this.timeOutf)
+          } else {
+            this.countDownTimef--
+            this.countDownTimef = this.countDownTimef + 's'
+          }
+        },
         validationf(isGetMsg){
-          if(!utils.isEmail(this.userTelemail) && !utils.isTelphone(this.userTelemail)){
+          console.log(/^[A-Za-z0-9]{8,16}$/.test(this.userpassword))
+          if(!this.userTelemail){
+            Toast({
+              message:"请输入账号",
+              position: 'center',
+              duration: 1500
+            })
+            setTimeout(()=>{
+              this.isCurrentf=false
+            },1000)
+            setTimeout(()=>{
+              this.isActivef=false
+            },1000)
+            return false
+          } else if(!utils.isEmail(this.userTelemail) && !utils.isTelphone(this.userTelemail)){
             Toast({
               message:"请填写正确的账号",
               position: 'center',
@@ -287,10 +335,32 @@
               this.isActivef=false
             },1000)
             return false
+          }else if(this.phonemessage==''){
+            if(isGetMsg)return true
+            Toast({
+              message:"请填写验证码",
+              position: 'center',
+              duration: 1500
+            })
+            setTimeout(()=>{
+              this.isActivef=false
+            },1000)
+            return false
           }else if(this.userpassword==''){
             if(isGetMsg)return true
             Toast({
-              message:"请填写密码",
+              message:"请填写新密码",
+              position: 'center',
+              duration: 1500
+            })
+            setTimeout(()=>{
+              this.isActivef=false
+            },1000)
+            return false
+          }else if(!(/^[A-Za-z0-9]{8,16}$/.test(this.userpassword))){
+            if(isGetMsg)return true
+            Toast({
+              message:"新密码只能8~16位的数字或字母",
               position: 'center',
               duration: 1500
             })
@@ -317,7 +387,9 @@
             data:{
               "account":this.userTelemail
             },
-            method:'get'
+            noToken:"noNeed",
+            method:'get',
+            _this:this
 
           }).then(response=>{
             this.countDownf()
@@ -332,35 +404,33 @@
               "code":this.phonemessage,
               "password":this.userpassword
             },
+            _this:this,
             method: 'get',
             headers: {'Content-Type': "application/x-www-form-urlencoded"}
           }).then(response=>{
-            Toast({
-              message:"修改成功",
-              position: 'center',
-              duration: 1500
+//            修改成功直接跳首页
+            api.Login({
+              data: {
+                "username": this.userTelemail,
+                "password": this.userpassword,
+                "deviceId": this.deviceId
+              },
+              _this:this,
+              method: 'post',
+              noToken:'noNeed'
+            }).then(response => {
+
+              //vue-ls设置有效期时会 自动加一个new Date().getTime()
+              Vue.ls.set("X-AEK56-Token", response.token, response.expire-new Date().getTime());
+              this.getmsgNum(()=> {
+                this.$router.push({path: '/tabbar', query: {isLogin: true}});
+              })
+
+
             })
-//            this.$router.push('/')    //修改成功 返回登录页面
-            this.login = true
-            this.msglogin = false
-            this.findlogin = false
           })
         },
-        countDownf(){
-          this.isCountDownf=true
-          this.timeOutf=setInterval(this.updataTimef,1000)
-        },
-        updataTimef(){
-          this.countDownTimef = parseInt(this.countDownTimef)
-          if (this.countDownTimef <= 0) {
-            this.countDownTimef = '60s'
-            this.isCountDownf = false
-            clearInterval(this.Interval)
-          } else {
-            this.countDownTimef--
-            this.countDownTimef = this.countDownTimef + 's'
-          }
-        }
+
       },
       watch: {
 //        login
@@ -368,7 +438,7 @@
           if (utils.isEmail(this.username) || utils.isTelphone(this.username)) {
             this.isLightf = true
             this.isDisabledf = false
-            Vue.ls.set("username", this.username)
+//            Vue.ls.set("username", this.username)
           }
         },
 //        msg
@@ -376,7 +446,7 @@
           if (utils.isTelphone(val)) {
             this.isLightm = true
             this.isDisabled = false
-            Vue.ls.set("userphone", this.userphone)
+//            Vue.ls.set("userphone", this.userphone)
           }else{
             this.isLightm = false
             this.isDisabled = true
@@ -387,7 +457,7 @@
           if (utils.isEmail(this.userTelemail) || utils.isTelphone(this.userTelemail)) {
             this.isLightf = true
             this.isDisabledf = false
-            Vue.ls.set("userTelemail",this.userTelemail)
+//            Vue.ls.set("userTelemail",this.userTelemail)
           }
           else{
             this.isLightf = false
@@ -401,9 +471,12 @@
 <style lang="scss" scoped>
   @import "../assets/scss/reset.scss";
   @import "../assets/scss/my-mixin.scss";
+	body {
+	        background-color: #000;
+	 }
   .name{
     height: 100%;
-    background: #fff;
+    background-color: #fff;
   }
   .loginImg{
     /*margin-top: 180px;*/
@@ -441,13 +514,6 @@
   .changeMsg{
   @include forget(30px,0px,560px,center,28px,#666);
   }
-
-
-
-
-
-
-
   .yanzhengma{
     padding-right:0;
   input.phonemessage{
@@ -490,12 +556,6 @@
   .yanzhengma .light{
     background: #f8931f;
   }
-
-
-
-
-
-
 
   .yanzhengma{
     padding-right:0;

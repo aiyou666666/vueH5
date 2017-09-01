@@ -1,9 +1,9 @@
 <template>
   <div class="bigPircture">
     <mt-swipe :auto="0" :defaultIndex="defaultIndex">
-      <mt-swipe-item v-for='(item,index) of files'>
+      <mt-swipe-item v-for='(src,index) of currImgArr' :key="index">
         <span class="midder-line"></span>
-        <img  :src="item.src" width="100%" @click="tosta(index)"/>
+        <img  :src="src | showDetailImage " width="100%" @click="tosta(index)"/>
       </mt-swipe-item>
     </mt-swipe>
     <div class="delect" v-if="delect" @click="delectImg">
@@ -16,22 +16,27 @@
     export default{
       data(){
         return{
-          files:Vue.ls.get("files"),
-          defaultIndex:this.$route.query.index,
+          currImgArr:Vue.ls.get("currImgArr"),
+          defaultIndex:this.$route.query.index || 0 ,
           delect:false,
           imgIndex:''
         }
       },
+      created(){
+      	Vue.ls.set("newApply","isLooK")
+      	console.log("设置");
+        console.log(Vue.ls.get('newApply'))
+      },
       methods:{
         tosta(index){
-          this.delect=true
+          this.delect=!this.delect
           this.imgIndex=index
         },
         delectImg(){
-          this.files.splice(this.imgIndex, 1)
-          Vue.ls.set("files", this.files)
-          console.log(Vue.ls.get("files"))
+          this.currImgArr.splice(this.imgIndex, 1)
+          Vue.ls.set("currImgArr", this.currImgArr)
           this.delect=false
+
         }
       }
     }

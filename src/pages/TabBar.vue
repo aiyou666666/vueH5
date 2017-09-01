@@ -7,7 +7,7 @@
         <router-link tag="li" v-for="l in list" :to="l.uri" :key="l.id">
           <i>{{l.name}}</i>
           <!--<div class="icon"  v-bubble="{show:l.show,afterHide: (hide.bind(this,l)),value : msgNum}"   v-if="l.id==2&&(msgNum!=0||msgNum.data?msgNum.data!=0:'')" :class="{iconactive:msgNum>=100}">{{msgNum | msgNum}}</div>-->
-         <div class="icon"   v-if="l.id==2&&(msgNum!=0||msgNum.data?msgNum.data!=0:'')" :class="{iconactive:msgNum>=100}">{{msgNum | msgNum}}</div> 
+         <div class="icon"   v-if="l.id==2&&(msgNum!=0||msgNum.data?msgNum.data!=0:'')" :class="{iconactive:msgNum>=100}">{{msgNum | msgNum}}</div>
         </router-link>
       </ul>
     </div>
@@ -19,6 +19,17 @@
 	import api from '../service/api.js'
 	import utils from '../service/utils.js'
 	export default {
+	  created(){
+      api.msgNumfind({
+        method: 'get',
+        _this:this,
+        headers: {
+          'X-AEK56-Token': Vue.ls.get("X-AEK56-Token")
+        }
+      }).then(response=> {
+        Vue.ls.set("msgNum", response)
+      })
+    },
     data() {
 			return {
 			  number:'',
@@ -44,12 +55,12 @@
         this.msgNum = 0
         data['show'] = false
       }
-			
-			
+
+
 		}
-		
-		
-		
+
+
+
   }
 </script>
 <style scoped lang="scss">
@@ -101,12 +112,12 @@
     position: absolute;
     font-size:pxToRem(20px) ;
     border-radius: 50%;
-    right:pxToRem(135px);
-    top:0;
-    width: pxToRem(34px);
-    height: pxToRem(34px);
+    right:36%;
+    top:-3%;
+    width: pxToRem(37px);
+    height: pxToRem(37px);
     text-align: center;
-    line-height: pxToRem(37px);
+    line-height: pxToRem(39px);
   }
   .iconactive{
     width: pxToRem(52px);

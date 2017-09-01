@@ -1,6 +1,10 @@
 <template>
-  <div style="height: 100%;">
-    <div v-if="list.length!=0">
+  <div class="msg-container" style="height: 100%;">
+    <div v-show="loadingimg">
+      <div class="loading">
+        <img src="../assets/images/loading.gif" alt="">      </div>
+    </div>
+    <div v-if="has" class="msg-wrap">
       <ul
         v-infinite-scroll="loadMore"
         infinite-scroll-disabled="loading"
@@ -10,7 +14,7 @@
         <div v-show="loading&&!nodata" class="loadMore"><img src="../assets/images/jz.png" alt=""></div>
       </ul>
     </div>
-    <div  class="noresult" v-else>
+    <div  class="noresult" v-if="nohas">
       <img src="../assets/images/nodata.png" alt="">
       <div>暂无数据</div>
     </div>
@@ -27,11 +31,15 @@
           nodata:false,
           loading:false,
           list:[],
-          nodata:false
+          nodata:false,
+          nohas:false,
+          has:false,
+          loadingimg:true
         }
       },
       components:{MsgList},
       created(){
+        document.title='消息'
         this.ajax()
       },
       methods:{
@@ -41,6 +49,7 @@
             headers:{
               	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
            },
+           _this:this,
             data:{
               orderByField:'message_time',
               isAsc:false,
@@ -48,6 +57,7 @@
               pageNo:this.pageNo
             }
           }).then(response => {
+
             if(response.records.length==0){
               this.nodata = true;// 若数据已全部获取完毕
               this.loading=true;
@@ -55,6 +65,14 @@
               this.loading=false;
               this.list=this.list.concat(response.records)
             }
+            setTimeout(()=>{
+              this.loadingimg=false
+              if(this.list.length==0){
+                this.nohas=true
+              }else{
+                this.has=true
+              }
+            },1000)
           })
         },
         msgDetail(id,msgId){
@@ -66,15 +84,24 @@
           this.loading = true;
           setTimeout(() => {
               this.ajax()
-          }, 2500);
+          },500);
         },
       }
     }
+    
 </script>
 <style scoped lang="scss">
   @import "../assets/scss/reset.scss";
   @import "../assets/scss/my-mixin.scss";
   .noresult{
     height: 100%;
+    overflow: hidden;
   }
+ .msg-wrap{
+ 	position: fixed;
+ 	top: 0;
+ 	bottom:pxToRem(95px);
+ 	overflow-x: auto;
+ 	-webkit-overflow-scrolling:touch
+ }
 </style>

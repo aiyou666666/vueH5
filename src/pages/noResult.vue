@@ -4,7 +4,7 @@
       <img src="../assets/images/noresult.png" alt="">
       <div>无法获取设备信息，请检查二维码</div>
     </div>
-    <button-com class="btnLeave" @click.native="goHome"  :class="{active:isActive,btn:!isActive}">返回主页</button-com>
+    <button-com class="btnLeave" @click.native="goHome"  :class="{active:isActive,btn:!isActive}">返回首页</button-com>
   </div>
 </template>
 <script>

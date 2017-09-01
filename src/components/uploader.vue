@@ -2,14 +2,14 @@
  <div class="bigDiv">
     <div class="vue-uploader">
         <div class="file-list file-wrap file-padding" >
-            <section v-for="(file, index) of files" @click="previewImg(index)" class="file-item imgItem draggable-item">
-                <img :src="file.src" alt="" ondragstart="return false;">
+            <section v-for="(src, index) of currImgArr" @click="previewImg(index)" class="file-item imgItem draggable-item">
+                <img :src="src | showDetailImage" alt="" ondragstart="return false;">
                 <!--<span class="file-remove" @click="remove(index)">+</span>-->
             </section>
         	 <section class="file-item" v-if="showAdd">
                 <div class="add">
                    <img src="../assets/images/tjtp.png" />
-                   <input type="file" accept="image/*" @change="fileChanged" ref="file" multiple="multiple">
+                   <input type="file"  accept="image/*" @change="fileChanged"  ref="file">
                 </div>
             </section>
         </div>
@@ -40,14 +40,28 @@
         data() {
             return {
                 status: 'ready',
-                files: Vue.ls.get("files"),
-//                files: [],
+                files: Vue.ls.get("files") || [],
+                currImgArr:Vue.ls.get("currImgArr") || [],
                 point: {},
                 uploading: false,
                 percent: 0,
                 isShowPre:false,
                 showAdd:true
             }
+        },
+        created(){
+        	console.log(Vue.ls.get("newApply"));
+        	if(Vue.ls.get("newApply")=="isNewApply"){
+        		Vue.ls.remove("files")
+        	    Vue.ls.remove("currImgArr")
+                 this.files=[]
+                 this.currImgArr=[]
+        	}
+
+        	if(Vue.ls.get("currImgArr") && Vue.ls.get("currImgArr").length>=5){
+        		this.showAdd=false
+        	}
+
         },
         methods: {
           /*  add() {
@@ -73,9 +87,11 @@
                     this.uploading = false
                     if (xhr.status === 200 || xhr.status === 304) {
                         this.status = 'finished'
-                        this.imgArr.push(JSON.parse(xhr.response).data[0])
+                        this.imgArr.push(JSON.parse(xhr.response).data[JSON.parse(xhr.response).data.length-1])
+                        this.currImgArr.push(JSON.parse(xhr.response).data[JSON.parse(xhr.response).data.length-1])
                         this.$set(this, 'list', this.imgArr)
-                        console.log('upload success!')
+                        Vue.ls.set("currImgArr",this.currImgArr)
+
                     } else {
                         console.log(`error：error code ${xhr.status}`)
                     }
@@ -98,7 +114,6 @@
                             file: list[i]
                         }
                         this.html5Reader(list[i], item)
-
                         this.files.push(item)
                     }
                 }
@@ -138,7 +153,7 @@
             }
         },
       watch:{
-        files: function (val) {
+        currImgArr: function (val) {
           if(val.length>=5){
             this.showAdd=false
           }

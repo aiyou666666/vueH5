@@ -1,6 +1,10 @@
 <template>
   <div style="background: #eff3f6;padding-bottom: 30px">
-    <div v-show="hasID">
+    <div v-show="loading">
+      <div class="loading">
+        <img src="../assets/images/loading.gif" alt="">      </div>
+    </div>
+    <div v-show="limits">
       <mt-popup v-model="popupVisible2" position="top" class="mint-popup-2" :modal="false">
         <p ><img src="../assets/images/fail.png" alt=""><span>提交失败，请检查网络重试</span></p>
       </mt-popup>
@@ -13,7 +17,7 @@
         <!--v-model="sheetVisible2" class="sheet">-->
       <!--</mt-actionsheet>-->
     <div class="background"></div>
-    <div class="msgList">
+    <div class="msgList device-info">
       <ul>
         <li>
         	<input type="hidden" v-model="applyInfo.assetsNum"/>
@@ -45,22 +49,23 @@
     <div class="background"></div>
     <div class="uploadImg" style="width: 100%;overflow: hidden">
       <span>设备图片</span>
-      <uploader   :imgArr.sync="imgList"  :src="'/api/upload/upload'" :urgentLevel="applyInfo.urgentLevel" :faultDesc="applyInfo.faultDesc"></uploader>
+      <uploader   :imgArr.sync="imgList"  :src="'/api/upload/'" :urgentLevel="applyInfo.urgentLevel" :faultDesc="applyInfo.faultDesc"></uploader>
     </div>
     <div class="background"></div>
     <div class="decribe uploadImg">
       <span>故障描述</span>
-      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="applyInfo.faultDesc" ></textarea>
+      <textarea placeholder="请输入故障描述，300字以内，必填" v-model.trim="applyInfo.faultDesc" @keyup="key" @paste="key"></textarea>
       <span class="number"><i>{{applyInfo.faultDesc.length}}</i>/300</span>
     </div>
-    <button-com  @click.native="applyDone"  :class="{active:isActive,btn:!isActive}" >提交维修申请</button-com>
+    <button-com  @click.native="applyDone"  :class="{disabled:isdiable ,active:isActive,btn:!isActive}" >提交维修申请</button-com>
  </div>
-    <div v-show="!hasID">
+    <div v-show="nolimits">
       <div class="noresult">
+
         <img src="../assets/images/noresult.png" alt="">
-        <div>无法获取设备信息，请检查二维码</div>
+        <div>{{content}}</div>
       </div>
-      <button-com class="btnLeave" @click.native="goHome"  :class="{active:isActive,btn:!isActive}">返回主页</button-com>
+      <button-com class="btnLeave" @click.native="goHome"  :class="{active:isActive,btn:!isActive}">返回首页</button-com>
     </div>
   </div>
 </template>
@@ -75,7 +80,10 @@
   export default{
     data(){
       return{
-        hasID:true,
+        loading:true,
+        limits:false,
+        nolimits:false,
+        isdiable:false,
         isActive:false,
         sheetVisible :false,
         sheetVisible2 :false,
@@ -85,21 +93,54 @@
         actions2:[],
         assetsImgsrc:'',
         imgList:[],
+        content:'',
         applyInfo:{
           faultDesc:''
-
         }
       }
     },
     components:{ButtonCom,uploader},
     created (){
+    	let _this=this;
       if(Vue.ls.get("urgentLevel")){
         this.isColor=true
       }
+
     	api.getDeviceDetail({
-    	   data: {
-          id:this.$route.query.id
+    	   data: {id:this.$route.query.id},
+          callBack:function(res){
+        	if(res.code!=200 || !res.data){
+            setTimeout(()=>{
+              _this.loading=false
+              _this.limits=false
+              _this.content='无法获取设备信息，请检查二维码'
+              _this.nolimits=true
+            },1000)
+          }else if(res.data && res.data.statusName=='维修中'){
+            setTimeout(()=>{
+              _this.loading=false
+              _this.limits=false
+              _this.nolimits=true
+              _this.content='此设备在维修中'
+            },1000)
+          }else if(res.data && res.data.statusName=='已报废'){
+            setTimeout(()=>{
+              _this.loading=false
+              _this.limits=false
+              _this.nolimits=true
+              _this.content='此设备已报废，无法进行维修'
+            },1000)
+
+          }else if(res.code==200){
+            setTimeout(()=>{
+            _this.loading=false
+            _this.limits=true
+            _this.nolimits=false
+            },1000)
+          }
         },
+        _this:this,
+        isApply:'isApply',
         method:'get'
     	}).then(data=>{
     	  this.applyInfo={
@@ -111,17 +152,42 @@
     	  	faultDesc:Vue.ls.get("faultDesc"),                 //故障描述
     	  	assetsImg:this.imgList,       //设备图片
           urgentLevel:Vue.ls.get("urgentLevel")?Vue.ls.get("urgentLevel"):'请选择',            //紧急程度
-    	  	tenantId:Vue.ls.get("useInfo").tenantId //机构id
+    	  	tenantId:Vue.ls.get("useInfo").tenantId ,//机构id
+          deptId:data.deptId, //部门id
+          factoryNum:data.factoryNum,//出厂型号
+          factoryName:data.factoryName,//生产商
+          startUseDate:data.startUseDate//启用日期
     	  }
     	})
     },
+    updated(){
+    	 Vue.ls.set("newApply","isNewApply");	
+    },
     methods:{
+      key(){
+        if(this.applyInfo.faultDesc.length>=300){
+          this.applyInfo.faultDesc=this.applyInfo.faultDesc.substr(0,300)
+        }
+      },
       goHome(){
         this.isActive=true
         this.$router.push('/tabbar')
       },
       applyDone(){
         this.isActive=true
+
+        if(this.isdiable)return
+//        如果没有部门id给予提示
+        if(!this.applyInfo.deptId){
+          Toast({
+            message: '该设备暂时无法提交维修申请，请稍后重试',
+            position: 'center',
+            duration: 1500
+          })
+          setTimeout(()=>{
+            this.isActive=false
+          },1000)
+        }
         if(this.applyInfo.urgentLevel=='请选择'){
           Toast({
             message: '请选择紧急程度',
@@ -131,27 +197,37 @@
           setTimeout(()=>{
             this.isActive=false
           },1000)
+        }else{
+
+          if(this.applyInfo.faultDesc==''){
+            Toast({
+              message: '请填写故障描述',
+              position: 'center',
+              duration: 1500
+            })
+            setTimeout(()=>{
+              this.isActive=false
+            },1000)
+          }
         }
-        if(this.applyInfo.faultDesc==''){
-          Toast({
-            message: '请填写故障描述',
-            position: 'center',
-            duration: 1500
-          })
-          setTimeout(()=>{
-            this.isActive=false
-          },1000)
-        }
-        if(this.applyInfo.urgentLevel !='请选择'&&this.applyInfo.faultDesc!=''){
+        if(this.applyInfo.urgentLevel !='请选择'&&this.applyInfo.faultDesc!='' && this.applyInfo.deptId){
         	//对图片进行切割
+        
+        	this.imgList=this.imgList.length!=0 ?  this.imgList : Vue.ls.get("currImgArr")
         	this.applyInfo.assetsImg=(this.imgList.length && this.imgList.join(',')) ||''
+        	this.isdiable=true
           api.newApply({
             method:'post',
+            _this:this,
+            callBack:function(){
+            	this.isdiable=false
+            },
             data:this.applyInfo
           }).then(response => {
             this.$router.push({ path: '/applyDone', query: { id: response.id,newApply:1}})
           })
         }
+
       },
       sheet(){
         this.sheetVisible = true
@@ -215,6 +291,7 @@
   .msgList i{
     color: #bebebe;
   }
+
   .msgList i.urgencyColor{
     color: #666;
   }
@@ -222,6 +299,7 @@
     color: #333;
     display: inline-block;
     margin-right: pxToRem(70px);
+    vertical-align: middle;
   }
   .msgList i{
     color: #666;
@@ -253,6 +331,7 @@
   }
   .decribe{
     margin-bottom: pxToRem(60px) ;
+    border-bottom: 1px solid #e5e5e5;
   }
   .decribe textarea{
     width: pxToRem(510px);
@@ -267,6 +346,17 @@
     float: right;
     color: #bebebe;
   }
+.device-info {
+  	i{
+  		width:pxToRem(500px);
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
+			display: inline-block;
+			vertical-align: middle;
+  	}
+  }
+
 
 </style>
 

@@ -35,8 +35,6 @@
 			}
 		},
 		created(){
-			console.log("11111111111");
-			console.log(Vue.ls.get("X-AEK56-Token"));
 			if(Vue.ls.get("X-AEK56-Token")){
 				/*this.getmsgNum(()=>{
 								this.$router.push({path:'/tabbar',query:{isLogin:true}});
@@ -75,6 +73,7 @@
 			getmsgNum(callback){
 				api.msgNum({
               method:'get',
+              _this:this,
               headers:{
               	'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
               }
@@ -93,6 +92,7 @@
 						"password": this.password,
 						"deviceId": this.deviceId
 					},
+					_this:this,
 					method:'post'
 
 			}).then(response => {
@@ -116,6 +116,9 @@
   .name{
     height: 100%;
     background: #fff;
+  }
+  body,html{
+  	background-color:#fff!important ;
   }
   .loginImg{
       /*margin-top: 180px;*/

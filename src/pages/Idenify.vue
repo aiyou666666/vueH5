@@ -26,7 +26,7 @@
     <div class="background"></div>
     <div class="decribe uploadImg">
       <span>备注</span>
-      <textarea placeholder="请输入故障描述，300字以内，可以不填" v-model="identifyComent" ></textarea>
+      <textarea placeholder="请输入备注，300字以内，非必填" v-model="identifyComent" @keyup="key" @paste="key"></textarea>
       <span class="number"><i>{{identifyComent.length}}</i>/300</span>
     </div>
     <button-com class="btnLeave" @click.native="applyDone" :class="{active:isActive,btn:!isActive}">提交</button-com>
@@ -38,6 +38,9 @@
   import api from '../service/api.js'
   import ButtonCom from '../components/Button'
   export default{
+    created(){
+      document.title='故障鉴定'
+    },
     data(){
       return{
         sheetVisible:false,
@@ -74,6 +77,7 @@
             headers:{
               'X-AEK56-Token':Vue.ls.get("X-AEK56-Token")
             },
+            _this:this,
             method:'post',
             data:{
               "applyId": this.$route.query.id,
@@ -93,6 +97,11 @@
       },
       sheet(){
         this.sheetVisible =true
+      },
+      key(){
+        if(this.identifyComent.length>=300){
+          this.identifyComent=this.identifyComent.substr(0,300)
+        }
       }
     },
     mounted(){
